@@ -5,12 +5,53 @@ const {
   deleteLink,
   getAllLinks,
 } = require('.');
+const { createAccount } = require('../accounts');
+const { createParty } = require('../parties');
+
+const getPartyId = async () => {
+  const user = {
+    email: 'testuser@test.test',
+    first_name: 'Test',
+    last_name: 'User',
+    address1: '123 Main St',
+    city: 'Test City',
+    state: 'Alabama',
+    zip_code: 500,
+    date_of_birth: new Date(1970, 0, 1),
+    country_iso_3: 'USA',
+    usa_citizenship_status: 'citizen',
+  };
+
+  const { data: partyData } = await createParty(user);
+  const [, [partyDetails]] = partyData.partyDetails;
+  return partyDetails.partyId;
+};
 
 describe('tapi/links', () => {
   let linkId;
   const fakeId = uuid.v4();
-  const accountId = 'A1695748';
-  const partyId = 'P1612869';
+  let accountId = '';
+  let partyId = '';
+  beforeAll(async () => {
+    const user = {
+      email: 'testuser@test.test',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    };
+    const { data: accountData } = await (createAccount(user));
+    accountId = accountData.accountDetails[0].accountId;
+
+    const { data: partyData } = await createParty(user);
+    const [, [partyDetails]] = partyData.partyDetails;
+    partyId = partyDetails.partyId;
+  });
   it('createLink -- first entry not account', async () => {
     const response = await createLink('not_account', 'asdf', 'bogus_type', 'some_string', 'a', false);
     expect(response.data).toStrictEqual(expect.objectContaining({
@@ -49,6 +90,24 @@ describe('tapi/links', () => {
       statusCode: '101',
     }));
   });
+  it('linkAccountOwner -- no such party', async () => {
+    const { data } = await linkAccountOwner(accountId, fakeId);
+    expect(data).toStrictEqual(expect.objectContaining({
+      statusCode: '203',
+    }));
+  });
+  it('linkAccountOwner -- success', async () => {
+    const { data } = await linkAccountOwner(accountId, partyId);
+    expect(data).toStrictEqual(expect.objectContaining({
+      statusCode: '101',
+    }));
+  });
+  it('linkAccountOwner -- link exists', async () => {
+    const { data } = await linkAccountOwner(accountId, partyId);
+    expect(data).toStrictEqual(expect.objectContaining({
+      statusCode: '206',
+    }));
+  });
   it('linkAccountIndividual -- no such party', async () => {
     const { data } = await linkAccountIndividual(accountId, fakeId);
     expect(data).toStrictEqual(expect.objectContaining({
@@ -61,16 +120,10 @@ describe('tapi/links', () => {
       statusCode: '206',
     }));
   });
-  it('linkAccountOwner -- no such party', async () => {
-    const { data } = await linkAccountOwner(accountId, fakeId);
+  it('linkAccountIndividual -- success', async () => {
+    const { data } = await linkAccountIndividual(accountId, await getPartyId());
     expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '203',
-    }));
-  });
-  it('linkAccountOwner -- link exists', async () => {
-    const { data } = await linkAccountOwner(accountId, partyId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '206',
+      statusCode: '101',
     }));
   });
   it('getAllLinks -- no account', async () => {
