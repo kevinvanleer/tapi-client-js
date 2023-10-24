@@ -7,7 +7,7 @@ const {
 } = require('.');
 
 const {
-  parties, accounts, offerings, links,
+  parties, accounts, offerings, links, issuers,
 } = require('..');
 
 let offeringId;
@@ -16,9 +16,19 @@ let partyId;
 
 jest.setTimeout(10000);
 
+const getIssuerId = async () => {
+  const { data } = await issuers.createIssuer({
+    issuerName: 'Test issuer',
+    firstName: 'IssuerFirstName',
+    lastName: 'IssuerLastName',
+    email: 'issuer@email.com',
+  });
+  return data.issuerDetails[1][0].issuerId;
+};
+
 beforeAll(async () => {
   const { data: offering } = await offerings.createOffering({
-    issuerId: '9923624',
+    issuerId: await getIssuerId(),
     issueName: 'Test issue',
     issueType: 'Equity',
     minAmount: '1',
@@ -120,7 +130,19 @@ describe('trades', () => {
       statusDesc: 'Ok',
       partyDetails: expect.arrayContaining([
         expect.objectContaining({
-          orderId: expect.stringMatching(/[0-9]+/),
+          orderId: createdTradeId,
+          orderStatus: 'CREATED',
+        })]),
+    }));
+  });
+  it('getAllTrades', async () => {
+    const { data } = await getAllTrades();
+    expect(data).toStrictEqual(expect.objectContaining({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      TradeFinancialDetails: expect.arrayContaining([
+        expect.objectContaining({
+          orderId: createdTradeId,
           orderStatus: 'CREATED',
         })]),
     }));
@@ -132,15 +154,15 @@ describe('trades', () => {
       statusDesc: 'Ok',
     }));
   });
-  it('getAllTrades', async () => {
-    const { data } = await getAllTrades();
+  it('getTrade -- canceled', async () => {
+    const { data } = await getTrade(createdTradeId, accountId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',
       statusDesc: 'Ok',
-      TradeFinancialDetails: expect.arrayContaining([
+      partyDetails: expect.arrayContaining([
         expect.objectContaining({
-          orderId: expect.stringMatching(/[0-9]+/),
-          orderStatus: 'CREATED',
+          orderId: createdTradeId,
+          orderStatus: 'CANCELED',
         })]),
     }));
   });
