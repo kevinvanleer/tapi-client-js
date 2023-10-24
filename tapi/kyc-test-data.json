@@ -1,0 +1,176 @@
+[
+  {
+    "id_note": "Auto-pass KYC",
+    "api_result_code": "",
+    "first_name": "JOHN",
+    "last_name": "SMITH",
+    "address1": "222333 PEACHTREE PLACE",
+    "city": "ATLANTA",
+    "state": "GA",
+    "zip_code": 30318,
+    "date_of_birth": "1975-02-28",
+    "social_security_number": 112223333
+  },
+  {
+    "id_note": "COPPA Alert",
+    "api_result_code": "resultcode.coppa.alert",
+    "date_of_birth": "Feb-05",
+    "social_security_number": 3333
+  },
+  {
+    "id_note": "Address1 Does Not Match",
+    "api_result_code": "resultcode.address1.does.not.match",
+    "address1": "2240 MAGNOLIA"
+  },
+  {
+    "id_note": "Street Name Does Not Match",
+    "api_result_code": "resultcode.street.name.does.not.match",
+    "address1": "222333 MAGNOLIA"
+  },
+  {
+    "id_note": "Street Number Does Not Match",
+    "api_result_code": "resultcode.street.num-ber.does.not.match",
+    "address1": "2240 PEACHTREE PLACE"
+  },
+  {
+    "id_note": "Input Address1 is a PO Box",
+    "api_result_code": "resultcode.input.address1.is.po.box",
+    "address1": "PO BOX 123"
+  },
+  {
+    "id_note": "zip_code Code Does Not Match",
+    "api_result_code": "resultcode.zip_code.does.not.match",
+    "zip_code": 30316
+  },
+  {
+    "id_note": "YOB Does Not Match",
+    "api_result_code": "resultcode.yob.does.not.match",
+    "date_of_birth": "Feb-70"
+  },
+  {
+    "id_note": "YOB Does Not Match, Within Tolerance",
+    "api_result_code": "resultcode.yob.within.one.year",
+    "date_of_birth": "Feb-76"
+  },
+  {
+    "id_note": "MOB Does Not Match",
+    "api_result_code": "resultcode.mob.does.not.match",
+    "date_of_birth": "May-75"
+  },
+  {
+    "id_note": "Newer Record Found",
+    "api_result_code": "resultcode.newer.record.found",
+    "address1": "3612 ANY ST"
+  },
+  {
+    "id_note": "SSN Does Not Match",
+    "api_result_code": "resultcode.ssn.does.not.match",
+    "social_security_number": 3345
+  },
+  {
+    "id_note": "SSN Does Not Match, Within Tolerance",
+    "api_result_code": "resultcode.ssn.within.one.digit",
+    "social_security_number": 112223334
+  },
+  {
+    "id_note": "State Does Not Match",
+    "api_result_code": "resultcode.state.does.not.match",
+    "state": "AL"
+  },
+  {
+    "id_note": "Single Address1 in File",
+    "api_result_code": "resultcode.single.address1.in.file",
+    "first_name": "JANE",
+    "last_name": "SMITH",
+    "address1": "5432 ANY PLACE",
+    "city": "LA CRESCENTA",
+    "state": "CA",
+    "zip_code": 91214,
+    "date_of_birth": 1975,
+    "social_security_number": 1111
+  },
+  {
+    "id_note": "Thin File",
+    "api_result_code": "resultcode.thin.file",
+    "first_name": "JOHN",
+    "last_name": "BLACK",
+    "address1": "345 SOME AVE",
+    "city": "ATLANTA",
+    "state": "GA",
+    "zip_code": 30303,
+    "date_of_birth": "",
+    "social_security_number": ""
+  },
+  {
+    "id_note": "date_of_birth Not Available",
+    "api_result_code": "resultcode.no.date_of_birth.avail-able",
+    "first_name": "JANE",
+    "last_name": "BROWN",
+    "address1": "9000 ANY ST",
+    "city": "LA CRESCENTA",
+    "state": "CA",
+    "zip_code": 91224,
+    "date_of_birth": "",
+    "social_security_number": 1010
+  },
+  {
+    "id_note": "SSN Not Available",
+    "api_result_code": "resultcode.ssn.not.available",
+    "first_name": "JANE",
+    "last_name": "BLACK",
+    "address1": "12345 MAGNOLIA WAY",
+    "city": "ATLANTA",
+    "state": "GA",
+    "zip_code": 30303,
+    "date_of_birth": "Feb-75",
+    "social_security_number": ""
+  },
+  {
+    "id_note": "Subject Deceased",
+    "api_result_code": "resultcode.sub-ject.deceased",
+    "first_name": "JAMES",
+    "last_name": "WILLIAMS",
+    "address1": "5555 MOUNTAIN ROAD",
+    "city": "ROCKMART",
+    "state": "GA",
+    "zip_code": 30153,
+    "date_of_birth": "",
+    "social_security_number": ""
+  },
+  {
+    "id_note": "SSN Issue Prior to date_of_birth",
+    "api_result_code": "resultcode.ssn.issued.prior.to.date_of_birth",
+    "first_name": "WILLIAM",
+    "last_name": "JAMES",
+    "address1": "5555 BEACH AVENUE",
+    "city": "ROCKMART",
+    "state": "GA",
+    "zip_code": 30153,
+    "date_of_birth": "",
+    "social_security_number": 6789
+  },
+  {
+    "id_note": "SSN Invalid",
+    "api_result_code": "resultcode.ssn.not.valid",
+    "first_name": "WILLIAM",
+    "last_name": "JAMES",
+    "address1": "5555 BEACH AVENUE",
+    "city": "ROCKMART",
+    "state": "GA",
+    "zip_code": 30153,
+    "date_of_birth": "",
+    "social_security_number": 6789
+  },
+  {
+    "id_note": "Warm Address1",
+    "api_result_code": "resultcode.warm.address1.alert",
+    "first_name": "JANE",
+    "last_name": "WILLIAMS",
+    "address1": "8888 ANY STREET",
+    "city": "DALLAS",
+    "state": "GA",
+    "zip_code": 30132,
+    "date_of_birth": 1975,
+    "social_security_number": 3333
+  }
+]

@@ -1,0 +1,22 @@
+ID Note,API Result Code,First Name,Last Name,Address,City,State,ZIP,DOB,SSN4
+COPPA Alert,resultcode.coppa.alert,JOHN,SMITH,222333 PEACHTREE PLACE,ATLANTA,GA,30318,Feb-05,3333
+Address Does Not Match,resultcode.address.does.not.match,JOHN,SMITH,2240 MAGNOLIA,ATLANTA,GA,30318,,3333
+Street Name Does Not Match,resultcode.street.name.does.not.match,JOHN,SMITH,222333 MAGNOLIA,ATLANTA,GA,30318,,3333
+Street Number Does Not Match,resultcode.street.num-ber.does.not.match,JOHN,SMITH,2240 PEACHTREE PLACE,ATLANTA,GA,30318,,3333
+Input Address is a PO Box,resultcode.input.address.is.po.box,JOHN,SMITH,PO BOX 123,ATLANTA,GA,30318,,3333
+ZIP Code Does Not Match,resultcode.zip.does.not.match,JOHN,SMITH,222333 PEACHTREE PLACE,ATLANTA,GA,30316,1975,3333
+YOB Does Not Match,resultcode.yob.does.not.match,JOHN,SMITH,222333 PEACHTREE PLACE,ATLANTA,GA,30318,Feb-70,3333
+"YOB Does Not Match, Within Tolerance",resultcode.yob.within.one.year,JOHN,SMITH,222333 PEACHTREE PLACE,ATLANTA,GA,30318,Feb-76,3333
+MOB Does Not Match,resultcode.mob.does.not.match,JOHN,SMITH,222333 PEACHTREE PLACE,ATLANTA,GA,30318,May-75,3333
+Newer Record Found,resultcode.newer.record.found,JOHN,SMITH,3612 ANY ST,ATLANTA,GA,30318,,3333
+SSN Does Not Match,resultcode.ssn.does.not.match,JOHN,SMITH,222333 PEACHTREE PLACE,ATLANTA,GA,30318,,3345
+"SSN Does Not Match, Within Tolerance",resultcode.ssn.within.one.digit,JOHN,SMITH,222333 PEACHTREE PLACE,ATLANTA,GA,30318,,3334
+State Does Not Match,resultcode.state.does.not.match,JOHN,SMITH,222333 PEACHTREE PLACE,ATLANTA,AL,30318,,3333
+Single Address in File,resultcode.single.address.in.file,JANE,SMITH,5432 ANY PLACE,LA CRESCENTA,CA,91214,1975,1111
+Thin File,resultcode.thin.file,JOHN,BLACK,345 SOME AVE,ATLANTA,GA,30303,,
+DOB Not Available,resultcode.no.dob.avail-able,JANE,BROWN,9000 ANY ST,LA CRESCENTA,CA,91224,,1010
+SSN Not Available,resultcode.ssn.not.available,JANE,BLACK,12345 MAGNOLIA WAY,ATLANTA,GA,30303,Feb-75,
+Subject Deceased,resultcode.sub-ject.deceased,JAMES,WILLIAMS,5555 MOUNTAIN ROAD,ROCKMART,GA,30153,,
+SSN Issue Prior to DOB,resultcode.ssn.issued.prior.to.dob,WILLIAM,JAMES,5555 BEACH AVENUE,ROCKMART,GA,30153,,6789
+SSN Invalid,resultcode.ssn.not.valid,WILLIAM,JAMES,5555 BEACH AVENUE,ROCKMART,GA,30153,,6789
+Warm Address,resultcode.warm.address.alert,JANE,WILLIAMS,8888 ANY STREET,DALLAS,GA,30132,1975,3333
