@@ -8,11 +8,6 @@ const {
   RemovalPolicy,
 
 } = require('aws-cdk-lib');
-// const s3 = require('@aws-cdk/aws-s3');
-// const s3deploy = require('@aws-cdk/aws-s3-deployment');
-// const cloudfront = require('@aws-cdk/aws-cloudfront');
-// const route53 = require('@aws-cdk/aws-route53');
-// const targets = require('@aws-cdk/aws-route53-targets');
 const path = require('path');
 
 class TapiTestReportStack extends cdk.Stack {
