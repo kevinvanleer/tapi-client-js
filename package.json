@@ -49,6 +49,18 @@
     "npm": ">=8"
   },
   "jest": {
-    "setupFilesAfterEnv": ["./setupParty.js"]
+    "reporters": [
+      "default",
+      [
+        "jest-html-reporters",
+        {
+          "publicPath": "./html-report",
+          "filename": "index.html"
+        }
+      ]
+    ],
+    "setupFilesAfterEnv": [
+      "./setupParty.js"
+    ]
   }
 }

@@ -1,5 +1,21 @@
 const { auth, getFormattedDate, stateNameToAbbr } = require('../util');
 
+const requiredFields = [
+  'email',
+  'first_name',
+  'last_name',
+  'address1',
+  'city',
+  'state',
+  'zip_code',
+  'date_of_birth',
+  'country_iso_3',
+  'usa_citizenship_status',
+];
+
+const hasRequiredPartyFields = (user) => requiredFields
+  .reduce((acc, column) => acc && user[column] != null, true);
+
 const citizenshipStatusToDomicile = (status) => {
   switch (status) {
     case 'citizen':
@@ -51,4 +67,5 @@ const filterParties = (parties, query, archived = false) => parties.partyDetails
 module.exports = {
   userToParty,
   filterParties,
+  hasRequiredPartyFields,
 };

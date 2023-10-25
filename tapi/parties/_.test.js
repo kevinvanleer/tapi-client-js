@@ -1,7 +1,9 @@
 const {
   createParty, updateParty, getAllParties, deleteParty,
 } = require('.');
-const { hasRequiredPartyFields } = require('../../../../utilities/users');
+const { hasRequiredPartyFields } = require('./util');
+
+jest.setTimeout(20000);
 
 describe('parties', () => {
   let createdPartyId;
