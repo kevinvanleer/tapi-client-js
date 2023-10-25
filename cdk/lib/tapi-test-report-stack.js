@@ -1,8 +1,11 @@
 const cdk = require('aws-cdk-lib');
 const {
+  aws_cloudfront_origins: origins,
   aws_s3: s3,
+  aws_iam: iam,
   aws_s3_deployment: s3deploy,
   aws_cloudfront: cloudfront,
+  RemovalPolicy,
 
 } = require('aws-cdk-lib');
 // const s3 = require('@aws-cdk/aws-s3');
@@ -12,31 +15,47 @@ const {
 // const targets = require('@aws-cdk/aws-route53-targets');
 const path = require('path');
 
-class TapiTestReportStackStack extends cdk.Stack {
+class TapiTestReportStack extends cdk.Stack {
   constructor(scope, id, props) {
     super(scope, id, props);
 
     // Create an S3 bucket for your static website
     const websiteBucket = new s3.Bucket(this, 'TapiTestReportBucket', {
-      websiteIndexDocument: 'index.html', // The main HTML file
+      publicReadAccess: false,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      removalPolicy: RemovalPolicy.DESTROY,
+      accessControl: s3.BucketAccessControl.PRIVATE,
+      objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+    });
+
+    const oai = new cloudfront.OriginAccessIdentity(this, 'OriginAccessIdentity');
+    websiteBucket.grantRead(oai);
+
+    websiteBucket.addToResourcePolicy(new iam.PolicyStatement({
+      actions: ['s3:GetObject'],
+      resources: [websiteBucket.arnForObjects('*')],
+      principals: [new iam.CanonicalUserPrincipal(
+        oai.cloudFrontOriginAccessIdentityS3CanonicalUserId,
+      )],
+    }));
+
+    // Create a CloudFront distribution for the website
+    const distribution = new cloudfront.Distribution(this, 'TapiTestReportDistribution', {
+      defaultRootObject: 'index.html',
+      defaultBehavior: {
+        origin: new origins.S3Origin(websiteBucket, {
+          originAccessIdentity: oai,
+        }),
+      },
     });
 
     // Upload the static website files to the S3 bucket
-    s3deploy.BucketDeployment(this, 'WebsiteDeployment', {
-      sources: [s3deploy.Source.asset(path.join(__dirname, '../html-report'))], // Replace with your local folder path
+    const s3upload = new s3deploy.BucketDeployment(this, 'TapiTestReportDeployment', {
+      sources: [s3deploy.Source.asset(path.join(__dirname, '../../html-report'))], // Replace with your local folder path
       destinationBucket: websiteBucket,
-    });
-
-    // Create a CloudFront distribution for the website
-    const distribution = new cloudfront.CloudFrontWebDistribution(this, 'TapiTestReportDistribution', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: websiteBucket,
-          },
-          behaviors: [{ isDefaultBehavior: true }],
-        },
-      ],
+      distribution,
+      distributionPaths: ['/*'],
     });
 
     // Create a Route53 hosted zone if needed
@@ -53,4 +72,4 @@ class TapiTestReportStackStack extends cdk.Stack {
   }
 }
 
-module.exports = { TapiTestReportStackStack };
+module.exports = { TapiTestReportStack };

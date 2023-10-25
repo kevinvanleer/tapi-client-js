@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 const cdk = require('aws-cdk-lib');
-const { CdkStack } = require('../lib/cdk-stack');
+const { TapiTestReportStack } = require('../lib/tapi-test-report-stack');
 
 const app = new cdk.App();
-new CdkStack(app, 'CdkStack', {
+new TapiTestReportStack(app, 'TapiTestReportStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
