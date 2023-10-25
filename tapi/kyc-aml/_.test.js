@@ -9,7 +9,7 @@ describe('kyc-aml', () => {
     }));
   });
   it('performKycAml -- valid party', async () => {
-    const { data } = await (performKycAml('P1612869'));
+    const { data } = await (performKycAml(global.partyId));
     expect(data.statusDesc).toEqual('Ok');
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',
@@ -24,7 +24,7 @@ describe('kyc-aml', () => {
     expect(data.statusCode).toEqual('198');
   });
   it('getKycAml - valid party', async () => {
-    const { data } = await getKycAml('P1612869');
+    const { data } = await getKycAml(global.partyId);
     expect(data.statusDesc).toEqual('Ok');
     expect(data.kycamlDetails).toStrictEqual(expect.objectContaining({
       statusCode: '101',
