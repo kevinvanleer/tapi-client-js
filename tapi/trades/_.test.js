@@ -7,12 +7,11 @@ const {
 } = require('.');
 
 const {
-  parties, accounts, offerings, links, issuers,
+  accounts, offerings, links, issuers,
 } = require('..');
 
 let offeringId;
 let accountId;
-let partyId;
 
 jest.setTimeout(10000);
 
@@ -55,18 +54,14 @@ beforeAll(async () => {
     country_iso_3: 'USA',
     usa_citizenship_status: 'citizen',
   };
-  const { data: party } = await parties.createParty(user);
-  const [, [partyDetails]] = party.partyDetails;
-  partyId = partyDetails.partyId;
   const { data: account } = await accounts.createAccount(user);
   accountId = account.accountDetails[0].accountId;
-  await links.linkAccountOwner(accountId, partyDetails.partyId);
+  await links.linkAccountOwner(accountId, global.partyId);
 });
 
 afterAll(() => {
   if (offeringId) offerings.deleteOffering(offeringId);
   if (accountId) accounts.deleteAccount(accountId);
-  if (partyId) parties.deleteParty(partyId);
 });
 
 describe('trades', () => {

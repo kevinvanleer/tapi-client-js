@@ -31,7 +31,6 @@ describe('tapi/links', () => {
   let linkId;
   const fakeId = uuid.v4();
   let accountId = '';
-  let partyId = '';
   beforeAll(async () => {
     const user = {
       email: 'testuser@test.test',
@@ -47,10 +46,6 @@ describe('tapi/links', () => {
     };
     const { data: accountData } = await (createAccount(user));
     accountId = accountData.accountDetails[0].accountId;
-
-    const { data: partyData } = await createParty(user);
-    const [, [partyDetails]] = partyData.partyDetails;
-    partyId = partyDetails.partyId;
   });
   it('createLink -- first entry not account', async () => {
     const response = await createLink('not_account', 'asdf', 'bogus_type', 'some_string', 'a', false);
@@ -97,13 +92,13 @@ describe('tapi/links', () => {
     }));
   });
   it('linkAccountOwner -- success', async () => {
-    const { data } = await linkAccountOwner(accountId, partyId);
+    const { data } = await linkAccountOwner(accountId, global.partyId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',
     }));
   });
   it('linkAccountOwner -- link exists', async () => {
-    const { data } = await linkAccountOwner(accountId, partyId);
+    const { data } = await linkAccountOwner(accountId, global.partyId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '206',
     }));
@@ -115,7 +110,7 @@ describe('tapi/links', () => {
     }));
   });
   it('linkAccountIndividual -- link exists', async () => {
-    const { data } = await linkAccountIndividual(accountId, partyId);
+    const { data } = await linkAccountIndividual(accountId, global.partyId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '206',
     }));
