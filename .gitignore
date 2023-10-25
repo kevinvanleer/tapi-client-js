@@ -1,3 +1,4 @@
 node_modules
 .env*
-html-report
+html-report/qa
+html-report/sandbox

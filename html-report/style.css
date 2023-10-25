@@ -1,0 +1,122 @@
+
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Set background color and text color for the entire page */
+body {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  padding: 1em;
+}
+
+/* Headers and Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: #ffffff;
+}
+
+/* Links */
+a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #2980b9;
+}
+
+/* Buttons */
+button, .btn {
+  background-color: #3498db;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+button:hover, .btn:hover {
+  background-color: #2980b9;
+}
+
+/* Form Elements */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  border: 1px solid #34495e;
+}
+
+/* Dropdowns */
+select {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  border: 1px solid #34495e;
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table, th, td {
+  border: 1px solid #34495e;
+}
+
+th, td {
+  padding: 8px;
+}
+
+/* Highlighted or Selected Items */
+.highlight {
+  background-color: #2980b9;
+  color: #ffffff;
+}
+
+/* Navigation Menu */
+.navbar {
+  background-color: #2c3e50;
+}
+
+.navbar a {
+  color: #ffffff;
+}
+
+.navbar a:hover {
+  color: #3498db;
+}
+
+.spacer {
+  margin: 1em;
+}
+
+/* Footer */
+.footer {
+  background-color: #34495e;
+  color: #ecf0f1;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Dark mode toggle button (optional) */
+.dark-mode-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+/* Media Queries (adjust as needed) */
+@media (max-width: 768px) {
+  /* Add responsive styles here */
+}
