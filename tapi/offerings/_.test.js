@@ -74,6 +74,7 @@ describe('offerings', () => {
     }));
   });
   it('getOffering -- success', async () => {
+    expect(createdOfferingId).toMatch(/[0-9]+/);
     const { data } = await getOffering(createdOfferingId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',
@@ -89,6 +90,7 @@ describe('offerings', () => {
     }));
   });
   it('deleteOffering -- success', async () => {
+    expect(createdOfferingId).toMatch(/[0-9]+/);
     const { data } = await deleteOffering(createdOfferingId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',

@@ -61,6 +61,7 @@ describe('issuers', () => {
     }));
   });
   it('getIssuer -- success', async () => {
+    expect(createdIssuerId).toMatch(/[0-9]+/);
     const { data } = await getIssuer(createdIssuerId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',
@@ -73,6 +74,7 @@ describe('issuers', () => {
     }));
   });
   it('deleteIssuer -- success', async () => {
+    expect(createdIssuerId).toMatch(/[0-9]+/);
     const { data } = await deleteIssuer(createdIssuerId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',

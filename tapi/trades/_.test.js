@@ -55,6 +55,7 @@ beforeAll(async () => {
     usa_citizenship_status: 'citizen',
   };
   const { data: account } = await accounts.createAccount(user);
+  if (account.statusCode !== '101') throw account;
   accountId = account.accountDetails[0].accountId;
   await links.linkAccountOwner(accountId, global.partyId);
 });
@@ -119,6 +120,7 @@ describe('trades', () => {
     }));
   });
   it('getTrade -- success', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
     const { data } = await getTrade(createdTradeId, accountId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',
@@ -143,6 +145,7 @@ describe('trades', () => {
     }));
   });
   it('deleteTrade -- success', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
     const { data } = await deleteTrade(createdTradeId, accountId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',
@@ -150,6 +153,7 @@ describe('trades', () => {
     }));
   });
   it('getTrade -- canceled', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
     const { data } = await getTrade(createdTradeId, accountId);
     expect(data).toStrictEqual(expect.objectContaining({
       statusCode: '101',

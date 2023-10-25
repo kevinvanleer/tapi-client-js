@@ -5,7 +5,10 @@
   "scripts": {
     "lint": "eslint --fix .",
     "test": "NODE_ENV=test jest --runInBand",
-    "tapi": "node ./tapi/tools/execute.mjs"
+    "tapi": "node ./tapi/tools/execute.mjs",
+    "upload-test-report": "aws s3 cp --recursive ./html-report/ s3://tapitestreportstack-tapitestreportbucket4eea3b17-c8jwb9b43yqk/",
+    "invalidate-test-report": "aws cloudfront create-invalidation --distribution-id E1DQQHLZFTPAHA --paths '/*'",
+    "publish-test-report": "npm run upload-test-report && npm run invalidate-test-report"
   },
   "dependencies": {
     "@stdlib/datasets-us-states-abbr": "^0.0.8",
@@ -55,7 +58,9 @@
         "jest-html-reporters",
         {
           "publicPath": "./html-report",
-          "filename": "index.html"
+          "filename": "index.html",
+          "pageTitle": "Transact API Test Report",
+          "darkTheme": true
         }
       ]
     ],
