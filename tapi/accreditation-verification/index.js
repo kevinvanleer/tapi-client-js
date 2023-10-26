@@ -1,6 +1,6 @@
 const FormData = require('form-data');
 const { Readable } = require('stream');
-const { auth, tapi } = require('../util');
+const { tapi, auth, post } = require('../util');
 
 const uploadVerificationDocument = (accountId, file) => {
   const data = new FormData();
@@ -20,26 +20,22 @@ const uploadVerificationDocument = (accountId, file) => {
   );
 };
 
-const getDocumentList = (accountId, documentId) => tapi.post('/getAiDocument', {
-  ...auth,
+const getDocumentList = (accountId, documentId) => post('/getAiDocument', {
   accountId,
   documentId,
 });
 
-const requestVerification = (accountId) => tapi.post('/requestAiVerification', {
-  ...auth,
+const requestVerification = (accountId) => post('/requestAiVerification', {
   accountId,
   aiMethod: 'Upload',
 });
 
-const updateVerification = (airequestId, aiRequestStatus = 'New Info Added') => tapi.post('/updateAiRequest', {
-  ...auth,
+const updateVerification = (airequestId, aiRequestStatus = 'New Info Added') => post('/updateAiRequest', {
   airequestId,
   aiRequestStatus,
 });
 
-const getVerificationStatus = (accountId) => tapi.post('/getAiRequest', {
-  ...auth,
+const getVerificationStatus = (accountId) => post('/getAiRequest', {
   accountId,
 });
 

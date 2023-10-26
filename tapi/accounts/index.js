@@ -1,7 +1,7 @@
 const { makeIndividualAccount } = require('./util');
-const { tapi, auth } = require('../util');
+const { put, post } = require('../util');
 
-const createAccount = (user) => tapi.put(
+const createAccount = (user) => put(
   '/createAccount',
   {
     ...makeIndividualAccount(user),
@@ -12,7 +12,7 @@ const createAccount = (user) => tapi.put(
   },
 );
 
-const updateAccount = (user) => tapi.put(
+const updateAccount = (user) => put(
   '/updateAccount',
   makeIndividualAccount(user),
 );
@@ -21,8 +21,8 @@ const upsertAccount = (user) => (user.accountId
   ? updateAccount(user)
   : createAccount(user));
 
-const getAllAccounts = () => tapi.post('/getAllAccounts', auth);
-const deleteAccount = (accountId) => tapi.post('/deleteAccount', { ...auth, accountId });
+const getAllAccounts = () => post('/getAllAccounts');
+const deleteAccount = (accountId) => post('/deleteAccount', { accountId });
 
 module.exports = {
   createAccount,

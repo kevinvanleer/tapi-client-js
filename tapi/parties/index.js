@@ -1,23 +1,22 @@
 const { userToParty } = require('./util');
-const { tapi, auth } = require('../util');
+const { put, post } = require('../util');
 
-const createParty = (user) => tapi.put(
+const createParty = (user) => put(
   '/createParty',
   userToParty(user),
 );
 
-const updateParty = (user) => tapi.post(
+const updateParty = (user) => post(
   '/updateParty',
   userToParty(user),
 );
 
-const getAllParties = () => tapi.post(
+const getAllParties = () => post(
   '/getAllParties',
-  auth,
 );
-const deleteParty = (partyId) => tapi.post(
+const deleteParty = (partyId) => post(
   '/deleteParty',
-  { ...auth, partyId },
+  { partyId },
 );
 
 const upsertParty = (user) => (user.partyId

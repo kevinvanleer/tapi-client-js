@@ -1,28 +1,27 @@
-const { tapi, auth } = require('../util');
+const { put, post } = require('../util');
 
-const getOffering = (offeringId) => tapi.post(
+const getOffering = (offeringId) => post(
   '/getOffering',
-  { ...auth, offeringId },
+  { offeringId },
 );
 
-const getAllOfferings = () => tapi.post(
+const getAllOfferings = () => post(
   '/getAllOffers',
-  { ...auth },
 );
 
-const createOffering = (offering) => tapi.put(
+const createOffering = (offering) => put(
   '/createOffering',
-  { ...auth, ...offering },
+  { ...offering },
 );
 
-const updateOffering = (offering) => tapi.post(
+const updateOffering = (offering) => post(
   '/updateOffering',
-  { ...auth, ...offering },
+  { ...offering },
 );
 
-const deleteOffering = (offeringId) => tapi.post(
+const deleteOffering = (offeringId) => post(
   '/deleteOffering',
-  { ...auth, offeringId },
+  { offeringId },
 );
 
 module.exports = {

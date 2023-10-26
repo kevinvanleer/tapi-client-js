@@ -1,4 +1,4 @@
-const { auth, getFormattedDate, stateNameToAbbr } = require('../util');
+const { getFormattedDate, stateNameToAbbr } = require('../util');
 
 const requiredFields = [
   'email',
@@ -28,7 +28,6 @@ const citizenshipStatusToDomicile = (status) => {
 };
 
 const userToParty = (user) => Object.fromEntries(Object.entries({
-  ...auth,
   partyId: user.partyId,
   domicile: user.usa_citizenship_status
     ? citizenshipStatusToDomicile(user.usa_citizenship_status) : null,

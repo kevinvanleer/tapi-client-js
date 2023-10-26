@@ -1,5 +1,4 @@
 const { hasRequiredPartyFields, userToParty } = require('./util');
-const { auth } = require('../util');
 
 describe('parties/util', () => {
   it('userToParty', () => {
@@ -15,7 +14,6 @@ describe('parties/util', () => {
       country_iso_3: 'USA',
       usa_citizenship_status: 'citizen',
     })).toStrictEqual({
-      ...auth,
       dob: '01-01-1970',
       domicile: 'U.S. citizen',
       emailAddress: 'testuser@test.com',
@@ -42,7 +40,6 @@ describe('parties/util', () => {
       country_iso_3: 'USA',
       usa_citizenship_status: 'citizen',
     })).toStrictEqual({
-      ...auth,
       dob: '01-01-1970',
       domicile: 'U.S. citizen',
       emailAddress: 'testuser@test.com',
@@ -56,7 +53,7 @@ describe('parties/util', () => {
     });
 
     expect(userToParty({
-    })).toStrictEqual(auth);
+    })).toStrictEqual({});
   });
   it('hasRequiredPartyFields', () => {
     expect(hasRequiredPartyFields({

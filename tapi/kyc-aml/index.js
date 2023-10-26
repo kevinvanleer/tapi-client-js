@@ -1,13 +1,13 @@
-const { tapi, auth } = require('../util');
+const { post } = require('../util');
 
-const performKycAmlBasic = (partyId) => tapi.post(
+const performKycAmlBasic = (partyId) => post(
   '/performKycAmlBasic',
-  { ...auth, partyId },
+  { partyId },
 );
 
-const getKycAml = (partyId, type) => tapi.post(
+const getKycAml = (partyId, type) => post(
   '/getKycAmlResponse',
-  { ...auth, partyId, type },
+  { partyId, type },
 );
 const getKycAmlBasic = (partyId) => getKycAml(partyId, 'Basic');
 const getKycAmlEnhanced = (partyId) => getKycAml(partyId, 'Enhanced');

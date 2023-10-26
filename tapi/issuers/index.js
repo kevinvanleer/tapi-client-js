@@ -1,28 +1,27 @@
-const { tapi, auth } = require('../util');
+const { put, post } = require('../util');
 
-const getIssuer = (issuerId) => tapi.post(
+const getIssuer = (issuerId) => post(
   '/getIssuer',
-  { ...auth, issuerId },
+  { issuerId },
 );
 
-const getAllIssuers = () => tapi.post(
+const getAllIssuers = () => post(
   '/getAllIssuers',
-  auth,
 );
 
-const createIssuer = (issuer) => tapi.put(
+const createIssuer = (issuer) => put(
   '/createIssuer',
-  { ...auth, ...issuer },
+  { ...issuer },
 );
 
-const updateIssuer = (issuer) => tapi.post(
+const updateIssuer = (issuer) => post(
   '/updateIssuer',
-  { ...auth, ...issuer },
+  { ...issuer },
 );
 
-const deleteIssuer = (issuerId) => tapi.post(
+const deleteIssuer = (issuerId) => post(
   '/deleteIssuer',
-  { ...auth, issuerId },
+  { issuerId },
 );
 
 module.exports = {

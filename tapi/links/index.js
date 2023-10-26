@@ -1,4 +1,4 @@
-const { tapi, auth } = require('../util');
+const { put, post } = require('../util');
 
 const createLink = (
   firstEntryType,
@@ -7,10 +7,9 @@ const createLink = (
   relatedEntry,
   linkType,
   primary,
-) => tapi.put(
+) => put(
   '/createLink',
   {
-    ...auth,
     firstEntryType,
     firstEntry,
     relatedEntryType,
@@ -38,8 +37,8 @@ const createAccountLink = (
 const linkAccountIndividual = (accountId, partyId, linkType = 'member', primary = false) => createAccountLink(accountId, 'IndivACParty', partyId, linkType, primary);
 const linkAccountOwner = (accountId, partyId) => createAccountLink(accountId, 'IndivACParty', partyId, 'owner', true);
 
-const getAllLinks = (accountId) => tapi.post('/getAllLinks', { ...auth, accountId });
-const deleteLink = (id) => tapi.post('/deleteLink', { ...auth, id });
+const getAllLinks = (accountId) => post('/getAllLinks', { accountId });
+const deleteLink = (id) => post('/deleteLink', { id });
 
 module.exports = {
   createLink,
