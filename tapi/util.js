@@ -5,11 +5,13 @@ const usStateNames = require('@stdlib/datasets-us-states-names');
 const apiHost = process.env.TAPI_HOST || 'https://api-sandboxdash.norcapsecurities.com';
 const tapiUriSegment = 'tapiv3/index.php/v3';
 const tapiUri = `${apiHost}/${tapiUriSegment}`;
+// const mimeType = 'application/x-www-form-urlencoded';
+const mimeType = 'application/json';
 
 const tapi = axios.create({
   baseURL: tapiUri,
   timeout: 10000,
-  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  headers: { accept: mimeType, 'content-type': mimeType },
   validateStatus(status) {
     return status >= 200 && status < 500; // default
   },
@@ -29,8 +31,8 @@ const auth = {
   developerAPIKey: process.env.TAPI_API_KEY,
 };
 
-const put = (command, payload) => tapi.put(command, new URLSearchParams({ ...auth, ...payload }));
-const post = (command, payload) => tapi.post(command, new URLSearchParams({ ...auth, ...payload }));
+const put = (command, payload) => tapi.put(command, { ...auth, ...payload });
+const post = (command, payload) => tapi.post(command, { ...auth, ...payload });
 const execute = (command, payload) => (command.startsWith('create') ? put(command, payload) : post(command, payload));
 
 const getFormattedDate = (date) => `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;

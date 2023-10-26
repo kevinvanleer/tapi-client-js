@@ -3,21 +3,21 @@ const { tapi, auth } = require('../util');
 
 const createParty = (user) => tapi.put(
   '/createParty',
-  new URLSearchParams(userToParty(user)),
+  userToParty(user),
 );
 
 const updateParty = (user) => tapi.post(
   '/updateParty',
-  new URLSearchParams(userToParty(user)),
+  userToParty(user),
 );
 
 const getAllParties = () => tapi.post(
   '/getAllParties',
-  new URLSearchParams(auth),
+  auth,
 );
 const deleteParty = (partyId) => tapi.post(
   '/deleteParty',
-  new URLSearchParams({ ...auth, partyId }),
+  { ...auth, partyId },
 );
 
 const upsertParty = (user) => (user.partyId

@@ -9,7 +9,7 @@ const createLink = (
   primary,
 ) => tapi.put(
   '/createLink',
-  new URLSearchParams({
+  {
     ...auth,
     firstEntryType,
     firstEntry,
@@ -17,7 +17,7 @@ const createLink = (
     relatedEntry,
     linkType,
     primary_value: primary ? 1 : 0,
-  }),
+  },
 );
 
 const createAccountLink = (
@@ -26,13 +26,20 @@ const createAccountLink = (
   linkedObjectId,
   linkType,
   primary,
-) => createLink('Account', accountId, linkedObjectType, linkedObjectId, linkType, primary);
+) => createLink(
+  'Account',
+  accountId,
+  linkedObjectType,
+  linkedObjectId,
+  linkType,
+  primary,
+);
 
 const linkAccountIndividual = (accountId, partyId, linkType = 'member', primary = false) => createAccountLink(accountId, 'IndivACParty', partyId, linkType, primary);
 const linkAccountOwner = (accountId, partyId) => createAccountLink(accountId, 'IndivACParty', partyId, 'owner', true);
 
-const getAllLinks = (accountId) => tapi.post('/getAllLinks', new URLSearchParams({ ...auth, accountId }));
-const deleteLink = (id) => tapi.post('/deleteLink', new URLSearchParams({ ...auth, id }));
+const getAllLinks = (accountId) => tapi.post('/getAllLinks', { ...auth, accountId });
+const deleteLink = (id) => tapi.post('/deleteLink', { ...auth, id });
 
 module.exports = {
   createLink,

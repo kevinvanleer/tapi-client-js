@@ -2,12 +2,12 @@ const { tapi, auth } = require('../util');
 
 const performKycAmlBasic = (partyId) => tapi.post(
   '/performKycAmlBasic',
-  new URLSearchParams({ ...auth, partyId }),
+  { ...auth, partyId },
 );
 
 const getKycAml = (partyId, type) => tapi.post(
   '/getKycAmlResponse',
-  new URLSearchParams({ ...auth, partyId, type }),
+  { ...auth, partyId, type },
 );
 const getKycAmlBasic = (partyId) => getKycAml(partyId, 'Basic');
 const getKycAmlEnhanced = (partyId) => getKycAml(partyId, 'Enhanced');

@@ -20,28 +20,28 @@ const uploadVerificationDocument = (accountId, file) => {
   );
 };
 
-const getDocumentList = (accountId, documentId) => tapi.post('/getAiDocument', new URLSearchParams({
+const getDocumentList = (accountId, documentId) => tapi.post('/getAiDocument', {
   ...auth,
   accountId,
   documentId,
-}));
+});
 
-const requestVerification = (accountId) => tapi.post('/requestAiVerification', new URLSearchParams({
+const requestVerification = (accountId) => tapi.post('/requestAiVerification', {
   ...auth,
   accountId,
   aiMethod: 'Upload',
-}));
+});
 
-const updateVerification = (airequestId, aiRequestStatus = 'New Info Added') => tapi.post('/updateAiRequest', new URLSearchParams({
+const updateVerification = (airequestId, aiRequestStatus = 'New Info Added') => tapi.post('/updateAiRequest', {
   ...auth,
   airequestId,
   aiRequestStatus,
-}));
+});
 
-const getVerificationStatus = (accountId) => tapi.post('/getAiRequest', new URLSearchParams({
+const getVerificationStatus = (accountId) => tapi.post('/getAiRequest', {
   ...auth,
   accountId,
-}));
+});
 
 module.exports = {
   getDocumentList,

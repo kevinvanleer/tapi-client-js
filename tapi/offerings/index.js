@@ -2,27 +2,27 @@ const { tapi, auth } = require('../util');
 
 const getOffering = (offeringId) => tapi.post(
   '/getOffering',
-  new URLSearchParams({ ...auth, offeringId }),
+  { ...auth, offeringId },
 );
 
 const getAllOfferings = () => tapi.post(
   '/getAllOffers',
-  new URLSearchParams({ ...auth }),
+  { ...auth },
 );
 
 const createOffering = (offering) => tapi.put(
   '/createOffering',
-  new URLSearchParams({ ...auth, ...offering }),
+  { ...auth, ...offering },
 );
 
 const updateOffering = (offering) => tapi.post(
   '/updateOffering',
-  new URLSearchParams({ ...auth, ...offering }),
+  { ...auth, ...offering },
 );
 
 const deleteOffering = (offeringId) => tapi.post(
   '/deleteOffering',
-  new URLSearchParams({ ...auth, offeringId }),
+  { ...auth, offeringId },
 );
 
 module.exports = {
