@@ -124,7 +124,7 @@ describe('tapi/links', () => {
   it('getAllLinks -- no account', async () => {
     const { data } = await getAllLinks();
     expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '148',
+      statusCode: '106',
     }));
   });
   it('getAllLinks -- account does not exist', async () => {
