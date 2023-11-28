@@ -66,7 +66,9 @@
         }
       ]
     ],
-    "testPathIgnorePatterns": ["/cdk/"],
+    "testPathIgnorePatterns": [
+      "/cdk/"
+    ],
     "setupFilesAfterEnv": [
       "./setupParty.js"
     ]
