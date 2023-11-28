@@ -3,7 +3,6 @@ import { execute } from '../util.js';
 let command;
 let payload = {};
 process.argv.forEach((val, index, array) => {
-  console.log(val);
   if (val.endsWith('execute.mjs')) {
     command = array[index + 1];
     payload = JSON.parse(array[index + 2]);
@@ -15,6 +14,15 @@ if (command == null) {
   process.exit();
 }
 
-const { data } = await execute(command, payload);
-
-console.log(JSON.stringify(data,null,2));
+try {
+  const response = await execute(command, payload);
+  console.log(JSON.stringify(response.data, null, 2));
+  if (response.status >= 400) {
+    console.log('');
+    console.error(`ERROR: ${response.status}`);
+    console.error(response.statusText);
+  }
+} catch (e) {
+  console.error(`ERROR: ${e.response.status}`);
+  console.error(e.response.statusText);
+}
