@@ -10,7 +10,7 @@ const mimeType = 'application/json';
 
 const tapi = axios.create({
   baseURL: tapiUri,
-  timeout: 10000,
+  timeout: 60000,
   headers: { accept: mimeType, 'content-type': mimeType },
   validateStatus(status) {
     return status >= 200 && status < 500; // default
