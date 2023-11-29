@@ -41,6 +41,7 @@ describe('accounts', () => {
       expect.objectContaining({
         statusCode: '101',
         statusDesc: 'Ok',
+        accountDetails: expect.arrayContaining([expect.objectContaining({ accountId: expect.anything() })]),
       }),
     );
     createdAccountId = data.accountDetails[0].accountId;
