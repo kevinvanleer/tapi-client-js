@@ -18,6 +18,4 @@ const { data: parties } = await getAllParties();
 const matches = filterParties(parties, query);
 
 const results = await Promise.all(matches.map((match) => deleteParty(match.partyId)));
-console.log(`Found ${matches.length}, deleted: ${results.filter(
-  (result) => result.data.statusCode === '101',
-).length}`);
+console.log(`Found ${matches.length}, deleted: ${results.filter((result) => result.data.statusCode === '101').length}`);

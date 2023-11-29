@@ -6,9 +6,7 @@ const {
   uploadVerificationDocument,
 } = require('.');
 
-const {
-  parties, accounts, links,
-} = require('..');
+const { parties, accounts, links } = require('..');
 
 const testFileNames = {
   need_info: 'Test_Need_Info',
@@ -63,24 +61,30 @@ describe('tapi/accreditation-verification', () => {
       originalname: `${testFileNames.not_magic}.pdf`,
     };
     const response = await uploadVerificationDocument(accountId, fakeFile);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      document_details: 'Document has been uploaded Successfully',
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        document_details: 'Document has been uploaded Successfully',
+      }),
+    );
   });
   it('requestVerification', async () => {
     expect(typeof accountId).toBe('string');
     const response = await requestVerification(accountId);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      accreditedDetails: [{
-        accountId,
-        airequestId: expect.anything(),
-        accreditedStatus: 'pending',
-        aiRequestStatus: 'Pending',
-      }],
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        accreditedDetails: [
+          {
+            accountId,
+            airequestId: expect.anything(),
+            accreditedStatus: 'pending',
+            aiRequestStatus: 'Pending',
+          },
+        ],
+      }),
+    );
     aiRequestId = response.data.accreditedDetails.at(0).airequestId;
   });
   it('getVerificationStatus -- pending', async () => {
@@ -90,20 +94,20 @@ describe('tapi/accreditation-verification', () => {
       expect.objectContaining({
         statusCode: '101',
         accreditedDetails: expect.objectContaining({
-          documents:
-            expect.arrayContaining([
-              expect.objectContaining({
-                id: expect.anything(),
-                documentid: expect.anything(),
-              })]),
-          request:
-            expect.arrayContaining([
-              expect.objectContaining({
-                accountId,
-                accreditedStatus: 'pending',
-                aiMethod: 'Upload',
-                aiRequestStatus: 'Pending',
-              })]),
+          documents: expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.anything(),
+              documentid: expect.anything(),
+            }),
+          ]),
+          request: expect.arrayContaining([
+            expect.objectContaining({
+              accountId,
+              accreditedStatus: 'pending',
+              aiMethod: 'Upload',
+              aiRequestStatus: 'Pending',
+            }),
+          ]),
         }),
       }),
     );
@@ -112,15 +116,19 @@ describe('tapi/accreditation-verification', () => {
   it('updateVerification', async () => {
     expect(typeof aiRequestId).toBe('string');
     const response = await updateVerification(aiRequestId);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      accreditedDetails: [{
-        accountId,
-        airequestId: aiRequestId,
-        accreditedStatus: 'pending',
-        aiRequestStatus: 'New Info Added',
-      }],
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        accreditedDetails: [
+          {
+            accountId,
+            airequestId: aiRequestId,
+            accreditedStatus: 'pending',
+            aiRequestStatus: 'New Info Added',
+          },
+        ],
+      }),
+    );
   });
   it('getVerificationStatus -- new info', async () => {
     expect(typeof accountId).toBe('string');
@@ -129,20 +137,20 @@ describe('tapi/accreditation-verification', () => {
       expect.objectContaining({
         statusCode: '101',
         accreditedDetails: expect.objectContaining({
-          documents:
-            expect.arrayContaining([
-              expect.objectContaining({
-                id: expect.anything(),
-                documentid: expect.anything(),
-              })]),
-          request:
-            expect.arrayContaining([
-              expect.objectContaining({
-                accountId,
-                accreditedStatus: 'pending',
-                aiMethod: 'Upload',
-                aiRequestStatus: 'New Info Added',
-              })]),
+          documents: expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.anything(),
+              documentid: expect.anything(),
+            }),
+          ]),
+          request: expect.arrayContaining([
+            expect.objectContaining({
+              accountId,
+              accreditedStatus: 'pending',
+              aiMethod: 'Upload',
+              aiRequestStatus: 'New Info Added',
+            }),
+          ]),
         }),
       }),
     );
@@ -152,17 +160,19 @@ describe('tapi/accreditation-verification', () => {
     expect(typeof accountId).toBe('string');
     expect(typeof documentId).toBe('string');
     const response = await getDocumentList(accountId, documentId);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      document_details: expect.arrayContaining([
-        expect.objectContaining({
-          documentid: documentId,
-          accountId,
-          documentTitle: `documentTitle0="${testFileNames.not_magic}.pdf"`,
-          documentFileName: expect.anything(),
-          documentUrl: expect.anything(),
-        }),
-      ]),
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        document_details: expect.arrayContaining([
+          expect.objectContaining({
+            documentid: documentId,
+            accountId,
+            documentTitle: `documentTitle0="${testFileNames.not_magic}.pdf"`,
+            documentFileName: expect.anything(),
+            documentUrl: expect.anything(),
+          }),
+        ]),
+      }),
+    );
   });
 });

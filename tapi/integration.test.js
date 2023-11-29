@@ -31,74 +31,88 @@ describe('integration test', () => {
 
     it('create party', async () => {
       const { data: party } = await tapi.parties.createParty(getPartyInfo(1));
-      expect(party).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-      }));
+      expect(party).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+        }),
+      );
       const [, [partyDetails]] = party.partyDetails;
       expect(partyDetails).toStrictEqual(expect.objectContaining({ partyId: expect.stringMatching('P[0-9]*') }));
       partyId = partyDetails.partyId;
     });
     it('perform kyc/aml -- fails', async () => {
       const { data: kyc } = await tapi.kycAml.performKycAml(partyId);
-      expect(kyc).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-        kyc: expect.objectContaining({
-          amlstatus: 'Auto Approved',
-          kycstatus: 'Disapproved',
+      expect(kyc).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+          kyc: expect.objectContaining({
+            amlstatus: 'Auto Approved',
+            kycstatus: 'Disapproved',
+          }),
         }),
-      }));
+      );
     });
     it('update party', async () => {
       const { data: party } = await tapi.parties.updateParty({ ...getPartyInfo(0), partyId });
-      expect(party).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-      }));
+      expect(party).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+        }),
+      );
       const [, [partyDetails]] = party.partyDetails;
       expect(partyDetails).toStrictEqual(expect.objectContaining({ partyId: expect.stringMatching('P[0-9]*') }));
       partyId = partyDetails.partyId;
     });
     it('perform kyc/aml - pass', async () => {
       const { data: kyc } = await tapi.kycAml.performKycAml(partyId);
-      expect(kyc).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-        statusDesc: 'Ok',
-        kyc: expect.objectContaining({
-          amlstatus: 'Auto Approved',
-          kycstatus: 'Auto Approved',
+      expect(kyc).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+          statusDesc: 'Ok',
+          kyc: expect.objectContaining({
+            amlstatus: 'Auto Approved',
+            kycstatus: 'Auto Approved',
+          }),
         }),
-      }));
+      );
     });
     it('get kyc/aml - pass', async () => {
       const { data: kyc } = await tapi.kycAml.getKycAml(partyId);
-      expect(kyc.kycamlDetails).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-        statusDesc: 'Ok',
-        kyc: expect.objectContaining({
-          amlstatus: 'Auto Approved',
-          kycstatus: 'Auto Approved',
+      expect(kyc.kycamlDetails).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+          statusDesc: 'Ok',
+          kyc: expect.objectContaining({
+            amlstatus: 'Auto Approved',
+            kycstatus: 'Auto Approved',
+          }),
         }),
-      }));
+      );
     });
     it('create account', async () => {
       const { data: account } = await tapi.accounts.createAccount(user);
-      expect(account).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-      }));
-      const { accountDetails } = account;
-      expect(accountDetails).toStrictEqual(expect.arrayContaining([
+      expect(account).toStrictEqual(
         expect.objectContaining({
-          accountId: expect.stringMatching('A[0-9]*'),
-        })]));
+          statusCode: '101',
+        }),
+      );
+      const { accountDetails } = account;
+      expect(accountDetails).toStrictEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            accountId: expect.stringMatching('A[0-9]*'),
+          }),
+        ]),
+      );
       accountId = accountDetails[0].accountId;
     });
     it('create link', async () => {
-      const { data: link } = await tapi.links.linkAccountOwner(
-        accountId,
-        partyId,
+      const { data: link } = await tapi.links.linkAccountOwner(accountId, partyId);
+      expect(link).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+        }),
       );
-      expect(link).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-      }));
       const [, [linkDetails]] = link.linkDetails;
       expect(linkDetails).toStrictEqual(
         expect.objectContaining({
@@ -111,15 +125,21 @@ describe('integration test', () => {
       const { data: deleteLink } = await tapi.links.deleteLink(linkId);
       const { data: deleteAccount } = await tapi.accounts.deleteAccount(accountId);
       const { data: deleteParty } = await tapi.parties.deleteParty(partyId);
-      expect(deleteLink).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-      }));
-      expect(deleteAccount).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-      }));
-      expect(deleteParty).toStrictEqual(expect.objectContaining({
-        statusCode: '101',
-      }));
+      expect(deleteLink).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+        }),
+      );
+      expect(deleteAccount).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+        }),
+      );
+      expect(deleteParty).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+        }),
+      );
     });
   });
 });

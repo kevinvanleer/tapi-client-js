@@ -1,6 +1,4 @@
-const {
-  createParty, updateParty, getAllParties, deleteParty,
-} = require('.');
+const { createParty, updateParty, getAllParties, deleteParty } = require('.');
 const { hasRequiredPartyFields } = require('./util');
 
 jest.setTimeout(20000);
@@ -25,11 +23,13 @@ describe('parties', () => {
     expect(data.statusDesc).toEqual('Ok');
     expect(data.statusCode).toEqual('101');
     const [, [partyDetails]] = data.partyDetails;
-    expect(partyDetails).toStrictEqual(expect.objectContaining({
-      partyId: expect.anything(),
-      AMLstatus: null,
-      KYCstatus: null,
-    }));
+    expect(partyDetails).toStrictEqual(
+      expect.objectContaining({
+        partyId: expect.anything(),
+        AMLstatus: null,
+        KYCstatus: null,
+      }),
+    );
     createdPartyId = partyDetails.partyId;
   });
   it('createParty -- missing required field (email)', async () => {
@@ -54,35 +54,45 @@ describe('parties', () => {
       city: 'Best City',
     };
     const { data } = await updateParty(user);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusDesc: 'Ok',
-      statusCode: '101',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusDesc: 'Ok',
+        statusCode: '101',
+      }),
+    );
     const [, [partyDetails]] = data.partyDetails;
-    expect(partyDetails).toStrictEqual(expect.objectContaining({
-      partyId: createdPartyId,
-      AMLstatus: null,
-      KYCstatus: null,
-    }));
+    expect(partyDetails).toStrictEqual(
+      expect.objectContaining({
+        partyId: createdPartyId,
+        AMLstatus: null,
+        KYCstatus: null,
+      }),
+    );
   });
 
   it('getAllParties', async () => {
     const { data } = await getAllParties();
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      partyDetails: expect.anything(),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        partyDetails: expect.anything(),
+      }),
+    );
   });
   it('deleteParty -- does not exist', async () => {
     const { data } = await deleteParty('fake-party-id');
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '198',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '198',
+      }),
+    );
   });
   it('deleteParty -- success', async () => {
     const { data } = await deleteParty(createdPartyId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+      }),
+    );
   });
 });

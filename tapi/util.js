@@ -17,13 +17,12 @@ const tapi = axios.create({
   },
 });
 
-tapi.interceptors.response.use(
-  (response) => {
-    if (response.data.developerAPIKey) console.log('CONTAINS API KEY');
-    return response;
-  },
-);
-if (process.env.TAPI_CLIENT_ID == null) console.warn('WARNING: TAPI client is not defined. Check your environment configuration.');
+tapi.interceptors.response.use((response) => {
+  if (response.data.developerAPIKey) console.log('CONTAINS API KEY');
+  return response;
+});
+if (process.env.TAPI_CLIENT_ID == null)
+  console.warn('WARNING: TAPI client is not defined. Check your environment configuration.');
 if (process.env.TAPI_API_KEY == null) console.warn('WARNING: TAPI API key is not defined. Check your environment configuration.');
 
 const auth = {
@@ -35,10 +34,10 @@ const put = (command, payload) => tapi.put(command, { ...auth, ...payload });
 const post = (command, payload) => tapi.post(command, { ...auth, ...payload });
 const execute = (command, payload) => (command.startsWith('create') ? put(command, payload) : post(command, payload));
 
-const getFormattedDate = (date) => `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
+const getFormattedDate = (date) =>
+  `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
 
-const stateNameToAbbr = (name) => (usStateAbbr().includes(name)
-  ? name : usStateAbbr()[usStateNames().indexOf(name)]);
+const stateNameToAbbr = (name) => (usStateAbbr().includes(name) ? name : usStateAbbr()[usStateNames().indexOf(name)]);
 
 module.exports = {
   tapi,

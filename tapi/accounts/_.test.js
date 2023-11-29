@@ -1,6 +1,4 @@
-const {
-  createAccount, updateAccount, getAllAccounts, deleteAccount,
-} = require('.');
+const { createAccount, updateAccount, getAllAccounts, deleteAccount } = require('.');
 
 describe('accounts', () => {
   let createdAccountId;
@@ -17,11 +15,13 @@ describe('accounts', () => {
       country_iso_3: 'USA',
       usa_citizenship_status: 'citizen',
     };
-    const { data } = await (createAccount(user));
+    const { data } = await createAccount(user);
     expect(data.statusDesc).not.toEqual('Ok');
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '106',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
   });
   it('createAccount -- valid', async () => {
     const user = {
@@ -36,11 +36,13 @@ describe('accounts', () => {
       country_iso_3: 'USA',
       usa_citizenship_status: 'citizen',
     };
-    const { data } = await (createAccount(user));
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-    }));
+    const { data } = await createAccount(user);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
     createdAccountId = data.accountDetails[0].accountId;
     expect(createdAccountId.startsWith('A')).toBe(true);
   });
@@ -59,28 +61,35 @@ describe('accounts', () => {
       country_iso_3: 'USA',
       usa_citizenship_status: 'citizen',
     };
-    const { data } = await (updateAccount(user));
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-    }));
+    const { data } = await updateAccount(user);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
   });
   it('getAllAccounts', async () => {
     const { data } = await getAllAccounts();
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      accountDetails: expect.arrayContaining([
-        expect.objectContaining({
-          accountId: expect.anything(),
-        })]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        accountDetails: expect.arrayContaining([
+          expect.objectContaining({
+            accountId: expect.anything(),
+          }),
+        ]),
+      }),
+    );
   });
   it('deleteAccount -- success', async () => {
     const { data } = await deleteAccount(createdAccountId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
   });
 });

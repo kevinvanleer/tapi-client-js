@@ -1,10 +1,4 @@
-const {
-  createOffering,
-  updateOffering,
-  getAllOfferings,
-  getOffering,
-  deleteOffering,
-} = require('.');
+const { createOffering, updateOffering, getAllOfferings, getOffering, deleteOffering } = require('.');
 
 describe('offerings', () => {
   const issuerId = '9923624';
@@ -34,23 +28,29 @@ describe('offerings', () => {
   it('createOffering -- invalid', async () => {
     const { data } = await createOffering(offering);
     expect(data.statusDesc).not.toEqual('Ok');
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '106',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
   });
   it('createOffering -- valid', async () => {
     const { data } = await createOffering(validOffering);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      offeringDetails: expect.arrayContaining([
-        true,
-        expect.arrayContaining([
-          expect.objectContaining({
-            offeringId: expect.anything(),
-            offeringStatus: 'Pending',
-          })])]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        offeringDetails: expect.arrayContaining([
+          true,
+          expect.arrayContaining([
+            expect.objectContaining({
+              offeringId: expect.anything(),
+              offeringStatus: 'Pending',
+            }),
+          ]),
+        ]),
+      }),
+    );
     createdOfferingId = data.offeringDetails[1][0].offeringId;
     expect(createdOfferingId).toMatch(/[0-9]+/);
   });
@@ -62,50 +62,63 @@ describe('offerings', () => {
       field1: 'open',
     };
     const { data } = await updateOffering(updatedOffering);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      offeringDetails: expect.arrayContaining([
-        true,
-        expect.arrayContaining([{
-          offeringId: expect.anything(),
-          offeringStatus: 'Approved',
-        }])]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        offeringDetails: expect.arrayContaining([
+          true,
+          expect.arrayContaining([
+            {
+              offeringId: expect.anything(),
+              offeringStatus: 'Approved',
+            },
+          ]),
+        ]),
+      }),
+    );
   });
   it('getOffering -- success', async () => {
     expect(createdOfferingId).toMatch(/[0-9]+/);
     const { data } = await getOffering(createdOfferingId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      offeringDetails: expect.arrayContaining([
-        expect.objectContaining({
-          offeringId: createdOfferingId,
-          issueName: validOffering.issueName,
-          offeringStatus: 'Approved',
-          field1: 'open',
-          issuerId,
-        })]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        offeringDetails: expect.arrayContaining([
+          expect.objectContaining({
+            offeringId: createdOfferingId,
+            issueName: validOffering.issueName,
+            offeringStatus: 'Approved',
+            field1: 'open',
+            issuerId,
+          }),
+        ]),
+      }),
+    );
   });
   it('deleteOffering -- success', async () => {
     expect(createdOfferingId).toMatch(/[0-9]+/);
     const { data } = await deleteOffering(createdOfferingId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
   });
   it('getAllOfferings', async () => {
     const { data } = await getAllOfferings();
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      offeringDetails: expect.arrayContaining([
-        expect.objectContaining({
-          offeringId: expect.anything(),
-        })]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        offeringDetails: expect.arrayContaining([
+          expect.objectContaining({
+            offeringId: expect.anything(),
+          }),
+        ]),
+      }),
+    );
   });
 });

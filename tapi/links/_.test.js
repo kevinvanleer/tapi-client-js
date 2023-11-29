@@ -1,10 +1,5 @@
 const uuid = require('uuid');
-const {
-  createLink, createAccountLink,
-  linkAccountIndividual, linkAccountOwner,
-  deleteLink,
-  getAllLinks,
-} = require('.');
+const { createLink, createAccountLink, linkAccountIndividual, linkAccountOwner, deleteLink, getAllLinks } = require('.');
 const { createAccount } = require('../accounts');
 const { createParty } = require('../parties');
 
@@ -44,124 +39,162 @@ describe('tapi/links', () => {
       country_iso_3: 'USA',
       usa_citizenship_status: 'citizen',
     };
-    const { data: accountData } = await (createAccount(user));
+    const { data: accountData } = await createAccount(user);
     accountId = accountData.accountDetails[0].accountId;
   });
   it('createLink -- first entry not account', async () => {
     const response = await createLink('not_account', 'asdf', 'bogus_type', 'some_string', 'a', false);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '199',
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '199',
+      }),
+    );
   });
   it('createLink -- account does not exist', async () => {
     const { data } = await createLink('Account', 'asdf', 'bogus_type', 'some_string', 'a', false);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '199',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '199',
+      }),
+    );
   });
   it('createLink -- success', async () => {
     const { data } = await createLink('Account', accountId, 'bogus_type', fakeId, 'a', false);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+      }),
+    );
     const [, [linkDetails]] = data.linkDetails;
     linkId = linkDetails.id;
   });
   it('createLink -- link exists', async () => {
     const { data } = await createLink('Account', accountId, 'bogus_type', fakeId, 'a', false);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '206',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '206',
+      }),
+    );
   });
   it('createAccountLink -- link exists', async () => {
     const { data } = await createAccountLink(accountId, 'bogus_type', fakeId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '206',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '206',
+      }),
+    );
   });
   it('createAccountLink -- success', async () => {
     const { data } = await createAccountLink(accountId, 'bogus_type', uuid.v4());
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+      }),
+    );
   });
   it('linkAccountOwner -- no such party', async () => {
     const { data } = await linkAccountOwner(accountId, fakeId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '203',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '203',
+      }),
+    );
   });
   it('linkAccountOwner -- success', async () => {
     const { data } = await linkAccountOwner(accountId, global.partyId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+      }),
+    );
   });
   it('linkAccountOwner -- link exists', async () => {
     const { data } = await linkAccountOwner(accountId, global.partyId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '206',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '206',
+      }),
+    );
   });
   it('linkAccountIndividual -- no such party', async () => {
     const { data } = await linkAccountIndividual(accountId, fakeId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '203',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '203',
+      }),
+    );
   });
   it('linkAccountIndividual -- link exists', async () => {
     const { data } = await linkAccountIndividual(accountId, global.partyId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '206',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '206',
+      }),
+    );
   });
   it('linkAccountIndividual -- success', async () => {
     const { data } = await linkAccountIndividual(accountId, await getPartyId());
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+      }),
+    );
   });
   it('getAllLinks -- no account', async () => {
     const { data } = await getAllLinks();
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '106',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
   });
   it('getAllLinks -- account does not exist', async () => {
     const { data } = await getAllLinks(fakeId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '148',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '148',
+      }),
+    );
   });
   it('getAllLinks -- success', async () => {
     const { data } = await getAllLinks(accountId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      linkDetails: expect.anything(),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        linkDetails: expect.anything(),
+      }),
+    );
   });
   it('deleteLink -- null id', async () => {
     const { data } = await deleteLink();
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '106',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
   });
   it('deleteLink -- invalid id', async () => {
     const { data } = await deleteLink(fakeId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '106',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
   });
   it('deleteLink -- does not exist', async () => {
     const { data } = await deleteLink(1);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '404',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '404',
+      }),
+    );
   });
   it('deleteLink -- success', async () => {
     const { data } = await deleteLink(linkId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+      }),
+    );
   });
 });

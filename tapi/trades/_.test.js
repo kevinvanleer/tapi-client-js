@@ -1,14 +1,6 @@
-const {
-  createTrade,
-  editTrade,
-  getAllTrades,
-  getTrade,
-  deleteTrade,
-} = require('.');
+const { createTrade, editTrade, getAllTrades, getTrade, deleteTrade } = require('.');
 
-const {
-  accounts, offerings, links, issuers,
-} = require('..');
+const { accounts, offerings, links, issuers } = require('..');
 
 let offeringId;
 let accountId;
@@ -76,9 +68,11 @@ describe('trades', () => {
   it('createTrade -- invalid', async () => {
     const { data } = await createTrade(trade);
     expect(data.statusDesc).not.toEqual('Ok');
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '106',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
   });
   it('createTrade -- valid', async () => {
     const validTrade = {
@@ -88,17 +82,21 @@ describe('trades', () => {
     };
 
     const { data } = await createTrade(validTrade);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      purchaseDetails: expect.arrayContaining([
-        true,
-        expect.arrayContaining([
-          expect.objectContaining({
-            tradeId: expect.stringMatching(/[0-9]+/),
-            transactionStatus: 'CREATED',
-          })])]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        purchaseDetails: expect.arrayContaining([
+          true,
+          expect.arrayContaining([
+            expect.objectContaining({
+              tradeId: expect.stringMatching(/[0-9]+/),
+              transactionStatus: 'CREATED',
+            }),
+          ]),
+        ]),
+      }),
+    );
     createdTradeId = data.purchaseDetails[1][0].tradeId;
     expect(createdTradeId).toMatch(/[0-9]+/);
   });
@@ -111,58 +109,71 @@ describe('trades', () => {
       shares: '2',
     };
     const { data } = await editTrade(updatedTrade);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      TradeFinancialDetails: expect.objectContaining({
-        tradeId: createdTradeId,
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        TradeFinancialDetails: expect.objectContaining({
+          tradeId: createdTradeId,
+        }),
       }),
-    }));
+    );
   });
   it('getTrade -- success', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
     const { data } = await getTrade(createdTradeId, accountId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      partyDetails: expect.arrayContaining([
-        expect.objectContaining({
-          orderId: createdTradeId,
-          orderStatus: 'CREATED',
-        })]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        partyDetails: expect.arrayContaining([
+          expect.objectContaining({
+            orderId: createdTradeId,
+            orderStatus: 'CREATED',
+          }),
+        ]),
+      }),
+    );
   });
   it('getAllTrades', async () => {
     const { data } = await getAllTrades();
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      TradeFinancialDetails: expect.arrayContaining([
-        expect.objectContaining({
-          orderId: createdTradeId,
-          orderStatus: 'CREATED',
-        })]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        TradeFinancialDetails: expect.arrayContaining([
+          expect.objectContaining({
+            orderId: createdTradeId,
+            orderStatus: 'CREATED',
+          }),
+        ]),
+      }),
+    );
   });
   it('deleteTrade -- success', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
     const { data } = await deleteTrade(createdTradeId, accountId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
   });
   it('getTrade -- canceled', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
     const { data } = await getTrade(createdTradeId, accountId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      partyDetails: expect.arrayContaining([
-        expect.objectContaining({
-          orderId: createdTradeId,
-          orderStatus: 'CANCELED',
-        })]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        partyDetails: expect.arrayContaining([
+          expect.objectContaining({
+            orderId: createdTradeId,
+            orderStatus: 'CANCELED',
+          }),
+        ]),
+      }),
+    );
   });
 });

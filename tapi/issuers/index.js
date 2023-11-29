@@ -1,28 +1,14 @@
 const { put, post } = require('../util');
 
-const getIssuer = (issuerId) => post(
-  '/getIssuer',
-  { issuerId },
-);
+const getIssuer = (issuerId) => post('/getIssuer', { issuerId });
 
-const getAllIssuers = () => post(
-  '/getAllIssuers',
-);
+const getAllIssuers = () => post('/getAllIssuers');
 
-const createIssuer = (issuer) => put(
-  '/createIssuer',
-  { ...issuer },
-);
+const createIssuer = (issuer) => put('/createIssuer', { ...issuer });
 
-const updateIssuer = (issuer) => post(
-  '/updateIssuer',
-  { ...issuer },
-);
+const updateIssuer = (issuer) => post('/updateIssuer', { ...issuer });
 
-const deleteIssuer = (issuerId) => post(
-  '/deleteIssuer',
-  { issuerId },
-);
+const deleteIssuer = (issuerId) => post('/deleteIssuer', { issuerId });
 
 module.exports = {
   getIssuer,

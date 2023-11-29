@@ -10,34 +10,34 @@ const uploadVerificationDocument = (accountId, file) => {
   data.append('documentTitle', `documentTitle0="${file.originalname}"`);
   data.append('userfile', Readable.from(file.buffer), { filename: file.originalname });
 
-  return tapi.post(
-    '/uploadVerificationDocument',
-    data,
-    {
-      timeout: 60000,
-      headers: { ...data.getHeaders() },
-    },
-  );
+  return tapi.post('/uploadVerificationDocument', data, {
+    timeout: 60000,
+    headers: { ...data.getHeaders() },
+  });
 };
 
-const getDocumentList = (accountId, documentId) => post('/getAiDocument', {
-  accountId,
-  documentId,
-});
+const getDocumentList = (accountId, documentId) =>
+  post('/getAiDocument', {
+    accountId,
+    documentId,
+  });
 
-const requestVerification = (accountId) => post('/requestAiVerification', {
-  accountId,
-  aiMethod: 'Upload',
-});
+const requestVerification = (accountId) =>
+  post('/requestAiVerification', {
+    accountId,
+    aiMethod: 'Upload',
+  });
 
-const updateVerification = (airequestId, aiRequestStatus = 'New Info Added') => post('/updateAiRequest', {
-  airequestId,
-  aiRequestStatus,
-});
+const updateVerification = (airequestId, aiRequestStatus = 'New Info Added') =>
+  post('/updateAiRequest', {
+    airequestId,
+    aiRequestStatus,
+  });
 
-const getVerificationStatus = (accountId) => post('/getAiRequest', {
-  accountId,
-});
+const getVerificationStatus = (accountId) =>
+  post('/getAiRequest', {
+    accountId,
+  });
 
 module.exports = {
   getDocumentList,

@@ -1,10 +1,4 @@
-const {
-  createIssuer,
-  updateIssuer,
-  getAllIssuers,
-  getIssuer,
-  deleteIssuer,
-} = require('.');
+const { createIssuer, updateIssuer, getAllIssuers, getIssuer, deleteIssuer } = require('.');
 
 describe('issuers', () => {
   const issuer = {
@@ -21,23 +15,29 @@ describe('issuers', () => {
   it('createIssuer -- invalid', async () => {
     const { data } = await createIssuer(issuer);
     expect(data.statusDesc).not.toEqual('Ok');
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '106',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
   });
   it('createIssuer -- valid', async () => {
     const { data } = await createIssuer(validIssuer);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      issuerDetails: expect.arrayContaining([
-        true,
-        expect.arrayContaining([
-          expect.objectContaining({
-            issuerId: expect.anything(),
-            issuerStatus: 'Pending',
-          })])]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        issuerDetails: expect.arrayContaining([
+          true,
+          expect.arrayContaining([
+            expect.objectContaining({
+              issuerId: expect.anything(),
+              issuerStatus: 'Pending',
+            }),
+          ]),
+        ]),
+      }),
+    );
     createdIssuerId = data.issuerDetails[1][0].issuerId;
     expect(createdIssuerId).toMatch(/[0-9]+/);
   });
@@ -49,47 +49,60 @@ describe('issuers', () => {
       field1: 'open',
     };
     const { data } = await updateIssuer(updatedIssuer);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      issuerDetails: expect.arrayContaining([
-        true,
-        expect.arrayContaining([{
-          issuerId: expect.anything(),
-          issuerStatus: 'Approved',
-        }])]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        issuerDetails: expect.arrayContaining([
+          true,
+          expect.arrayContaining([
+            {
+              issuerId: expect.anything(),
+              issuerStatus: 'Approved',
+            },
+          ]),
+        ]),
+      }),
+    );
   });
   it('getIssuer -- success', async () => {
     expect(createdIssuerId).toMatch(/[0-9]+/);
     const { data } = await getIssuer(createdIssuerId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      issuerDetails: expect.arrayContaining([
-        expect.objectContaining({
-          issuerId: createdIssuerId,
-          issuerName: validIssuer.issuerName,
-        })]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        issuerDetails: expect.arrayContaining([
+          expect.objectContaining({
+            issuerId: createdIssuerId,
+            issuerName: validIssuer.issuerName,
+          }),
+        ]),
+      }),
+    );
   });
   it('deleteIssuer -- success', async () => {
     expect(createdIssuerId).toMatch(/[0-9]+/);
     const { data } = await deleteIssuer(createdIssuerId);
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Issuer deleted successfully!',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Issuer deleted successfully!',
+      }),
+    );
   });
   it('getAllIssuers', async () => {
     const { data } = await getAllIssuers();
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      issuerDetails: expect.arrayContaining([
-        expect.objectContaining({
-          issuerId: expect.anything(),
-        })]),
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        issuerDetails: expect.arrayContaining([
+          expect.objectContaining({
+            issuerId: expect.anything(),
+          }),
+        ]),
+      }),
+    );
   });
 });

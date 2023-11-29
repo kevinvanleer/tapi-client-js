@@ -2,22 +2,26 @@ const { performKycAml, getKycAml } = require('.');
 
 describe('kyc-aml', () => {
   it('performKycAml - invalid party', async () => {
-    const { data } = await (performKycAml('random-string'));
+    const { data } = await performKycAml('random-string');
     expect(data.statusDesc).not.toEqual('Ok');
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '198',
-    }));
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '198',
+      }),
+    );
   });
   it('performKycAml -- valid party', async () => {
-    const { data } = await (performKycAml(global.partyId));
+    const { data } = await performKycAml(global.partyId);
     expect(data.statusDesc).toEqual('Ok');
-    expect(data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      kyc: expect.objectContaining({
-        amlstatus: expect.anything(),
-        kycstatus: expect.anything(),
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        kyc: expect.objectContaining({
+          amlstatus: expect.anything(),
+          kycstatus: expect.anything(),
+        }),
       }),
-    }));
+    );
   });
   it('getKycAml - invalid party', async () => {
     const { data } = await getKycAml('random-string');
@@ -26,12 +30,14 @@ describe('kyc-aml', () => {
   it('getKycAml - valid party', async () => {
     const { data } = await getKycAml(global.partyId);
     expect(data.statusDesc).toEqual('Ok');
-    expect(data.kycamlDetails).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      kyc: expect.objectContaining({
-        amlstatus: expect.anything(),
-        kycstatus: expect.anything(),
+    expect(data.kycamlDetails).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        kyc: expect.objectContaining({
+          amlstatus: expect.anything(),
+          kycstatus: expect.anything(),
+        }),
       }),
-    }));
+    );
   });
 });

@@ -6,9 +6,7 @@ const {
   uploadVerificationDocument,
 } = require('.');
 
-const {
-  parties, accounts, links,
-} = require('..');
+const { parties, accounts, links } = require('..');
 
 const testFileNames = {
   need_info: 'Test_Need_Info',
@@ -61,24 +59,30 @@ describe('need more info', () => {
       originalname: `${testFileNames.need_info}.pdf`,
     };
     const response = await uploadVerificationDocument(accountId, fakeFile);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      document_details: 'Document has been uploaded Successfully',
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        document_details: 'Document has been uploaded Successfully',
+      }),
+    );
   });
   it('requestVerification -- TAPI sandbox bug', async () => {
     expect(typeof accountId).toBe('string');
     const response = await requestVerification(accountId);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      accreditedDetails: [{
-        accountId,
-        airequestId: expect.anything(),
-        accreditedStatus: 'pending',
-        aiRequestStatus: 'Pending',
-      }],
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        accreditedDetails: [
+          {
+            accountId,
+            airequestId: expect.anything(),
+            accreditedStatus: 'pending',
+            aiRequestStatus: 'Pending',
+          },
+        ],
+      }),
+    );
   });
   it('getVerificationStatus -- pending', async () => {
     expect(typeof accountId).toBe('string');
@@ -87,20 +91,20 @@ describe('need more info', () => {
       expect.objectContaining({
         statusCode: '101',
         accreditedDetails: expect.objectContaining({
-          documents:
-            expect.arrayContaining([
-              expect.objectContaining({
-                id: expect.anything(),
-                documentid: expect.anything(),
-              })]),
-          request:
-            expect.arrayContaining([
-              expect.objectContaining({
-                accountId,
-                accreditedStatus: 'pending',
-                aiMethod: 'Upload',
-                aiRequestStatus: 'Need More Info',
-              })]),
+          documents: expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.anything(),
+              documentid: expect.anything(),
+            }),
+          ]),
+          request: expect.arrayContaining([
+            expect.objectContaining({
+              accountId,
+              accreditedStatus: 'pending',
+              aiMethod: 'Upload',
+              aiRequestStatus: 'Need More Info',
+            }),
+          ]),
         }),
       }),
     );
@@ -147,24 +151,30 @@ describe('approved', () => {
       originalname: `${testFileNames.approved_all_parties}.pdf`,
     };
     const response = await uploadVerificationDocument(accountId, fakeFile);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      document_details: 'Document has been uploaded Successfully',
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        document_details: 'Document has been uploaded Successfully',
+      }),
+    );
   });
   it('requestVerification -- TAPI sandbox bug', async () => {
     expect(typeof accountId).toBe('string');
     const response = await requestVerification(accountId);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      accreditedDetails: [{
-        accountId,
-        airequestId: expect.anything(),
-        accreditedStatus: 'pending',
-        aiRequestStatus: 'Pending',
-      }],
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        accreditedDetails: [
+          {
+            accountId,
+            airequestId: expect.anything(),
+            accreditedStatus: 'pending',
+            aiRequestStatus: 'Pending',
+          },
+        ],
+      }),
+    );
   });
   it('getVerificationStatus -- pending', async () => {
     expect(typeof accountId).toBe('string');
@@ -173,20 +183,20 @@ describe('approved', () => {
       expect.objectContaining({
         statusCode: '101',
         accreditedDetails: expect.objectContaining({
-          documents:
-            expect.arrayContaining([
-              expect.objectContaining({
-                id: expect.anything(),
-                documentid: expect.anything(),
-              })]),
-          request:
-            expect.arrayContaining([
-              expect.objectContaining({
-                accountId,
-                accreditedStatus: 'Verified Accredited',
-                aiMethod: 'Upload',
-                aiRequestStatus: 'Approved',
-              })]),
+          documents: expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.anything(),
+              documentid: expect.anything(),
+            }),
+          ]),
+          request: expect.arrayContaining([
+            expect.objectContaining({
+              accountId,
+              accreditedStatus: 'Verified Accredited',
+              aiMethod: 'Upload',
+              aiRequestStatus: 'Approved',
+            }),
+          ]),
         }),
       }),
     );
@@ -233,24 +243,30 @@ describe('rejected', () => {
       originalname: `${testFileNames.rejected}.pdf`,
     };
     const response = await uploadVerificationDocument(accountId, fakeFile);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      statusDesc: 'Ok',
-      document_details: 'Document has been uploaded Successfully',
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        document_details: 'Document has been uploaded Successfully',
+      }),
+    );
   });
   it('requestVerification -- TAPI sandbox bug', async () => {
     expect(typeof accountId).toBe('string');
     const response = await requestVerification(accountId);
-    expect(response.data).toStrictEqual(expect.objectContaining({
-      statusCode: '101',
-      accreditedDetails: [{
-        accountId,
-        airequestId: expect.anything(),
-        accreditedStatus: 'pending',
-        aiRequestStatus: 'Pending',
-      }],
-    }));
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        accreditedDetails: [
+          {
+            accountId,
+            airequestId: expect.anything(),
+            accreditedStatus: 'pending',
+            aiRequestStatus: 'Pending',
+          },
+        ],
+      }),
+    );
   });
   it('getVerificationStatus -- pending', async () => {
     expect(typeof accountId).toBe('string');
@@ -259,20 +275,20 @@ describe('rejected', () => {
       expect.objectContaining({
         statusCode: '101',
         accreditedDetails: expect.objectContaining({
-          documents:
-            expect.arrayContaining([
-              expect.objectContaining({
-                id: expect.anything(),
-                documentid: expect.anything(),
-              })]),
-          request:
-            expect.arrayContaining([
-              expect.objectContaining({
-                accountId,
-                accreditedStatus: 'Not Accredited',
-                aiMethod: 'Upload',
-                aiRequestStatus: 'Rejected',
-              })]),
+          documents: expect.arrayContaining([
+            expect.objectContaining({
+              id: expect.anything(),
+              documentid: expect.anything(),
+            }),
+          ]),
+          request: expect.arrayContaining([
+            expect.objectContaining({
+              accountId,
+              accreditedStatus: 'Not Accredited',
+              aiMethod: 'Upload',
+              aiRequestStatus: 'Rejected',
+            }),
+          ]),
         }),
       }),
     );

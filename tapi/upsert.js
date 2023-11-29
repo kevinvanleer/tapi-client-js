@@ -1,9 +1,7 @@
 const { createParty, updateParty } = require('./parties');
 const { createAccount, updateAccount } = require('./accounts');
 const { linkAccountOwner } = require('./links');
-const {
-  hasRequiredPartyFields,
-} = require('../../../utilities/users');
+const { hasRequiredPartyFields } = require('../../../utilities/users');
 
 const createTapiResources = async (user, db) => {
   const { data: party } = await createParty(user);
@@ -21,10 +19,7 @@ const createTapiResources = async (user, db) => {
     return;
   }
 
-  const { data: link } = await linkAccountOwner(
-    account.accountDetails[0].accountId,
-    partyDetails.partyId,
-  );
+  const { data: link } = await linkAccountOwner(account.accountDetails[0].accountId, partyDetails.partyId);
   if (link.statusCode !== '101') {
     console.error('TAPI account/party link failed');
     console.error({
@@ -36,27 +31,33 @@ const createTapiResources = async (user, db) => {
   }
 
   const [, [linkDetails]] = link.linkDetails;
-  await db('nc_tapi_resources').insert([{
-    creator: user.id,
-    resource_type: 'individual_party',
-    resource_id: partyDetails.partyId,
-  }, {
-    creator: user.id,
-    resource_type: 'account',
-    resource_id: account.accountDetails[0].accountId,
-  }, {
-    creator: user.id,
-    resource_type: 'link',
-    resource_id: linkDetails.id,
-  }]);
+  await db('nc_tapi_resources').insert([
+    {
+      creator: user.id,
+      resource_type: 'individual_party',
+      resource_id: partyDetails.partyId,
+    },
+    {
+      creator: user.id,
+      resource_type: 'account',
+      resource_id: account.accountDetails[0].accountId,
+    },
+    {
+      creator: user.id,
+      resource_type: 'link',
+      resource_id: linkDetails.id,
+    },
+  ]);
 };
 
 const upsertTapiResources = async (user, db) => {
   if (hasRequiredPartyFields(user)) {
-    const parties = await db.select(['resource_type', 'resource_id'])
+    const parties = await db
+      .select(['resource_type', 'resource_id'])
       .from('nc_tapi_resources')
       .where({ creator: user.id, resource_type: 'individual_party' });
-    const accounts = await db.select(['resource_type', 'resource_id'])
+    const accounts = await db
+      .select(['resource_type', 'resource_id'])
       .from('nc_tapi_resources')
       .where({ creator: user.id, resource_type: 'account' });
     if (parties.length === 0) {
@@ -71,14 +72,16 @@ const upsertTapiResources = async (user, db) => {
         if (parties.length === 1) {
           const { data: result } = await updateParty({ ...user, partyId: parties[0].resource_id });
           if (result.statusCode === '101') {
-            await db('nc_tapi_resources').update({
-              updated_at: db.fn.now(),
-            }).where({ resource_id: parties[0].resource_id });
+            await db('nc_tapi_resources')
+              .update({
+                updated_at: db.fn.now(),
+              })
+              .where({ resource_id: parties[0].resource_id });
           } else {
             throw new Error(`Failed to update party: ${result.statusDesc}`);
           }
         } else {
-        // TODO: something
+          // TODO: something
         }
         if (accounts.length === 1) {
           const { data: result } = await updateAccount({
@@ -86,14 +89,16 @@ const upsertTapiResources = async (user, db) => {
             accountId: accounts[0].resource_id,
           });
           if (result.statusCode === '101') {
-            await db('nc_tapi_resources').update({
-              updated_at: db.fn.now(),
-            }).where({ resource_id: accounts[0].resource_id });
+            await db('nc_tapi_resources')
+              .update({
+                updated_at: db.fn.now(),
+              })
+              .where({ resource_id: accounts[0].resource_id });
           } else {
             throw new Error(`Failed to update account: ${result.statusDesc}`);
           }
         } else {
-        // TODO: something
+          // TODO: something
         }
       } catch (e) {
         console.error('Failed to update TAPI resources');
