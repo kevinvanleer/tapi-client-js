@@ -1,7 +1,7 @@
 const { createOffering, updateOffering, getAllOfferings, getOffering, deleteOffering } = require('.');
 
 describe('offerings', () => {
-  const issuerId = '9923624';
+  const issuerId = '1';
   const offering = {
     issuerId,
     issueName: 'Test issue',

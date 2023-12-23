@@ -19,7 +19,8 @@ const getIssuerId = async () => {
 
 beforeAll(async () => {
   const { data: offering } = await offerings.createOffering({
-    issuerId: await getIssuerId(),
+    // issuerId: await getIssuerId(),
+    issuerId: 1,
     issueName: 'Test issue',
     issueType: 'Equity',
     minAmount: '1',
