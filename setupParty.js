@@ -18,6 +18,6 @@ beforeAll(async () => {
   global.partyId = partyDetails.partyId;
 });
 
-afterAll(() => {
-  parties.deleteParty(global.partyId);
+afterAll(async () => {
+  await parties.deleteParty(global.partyId);
 });
