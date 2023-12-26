@@ -84,8 +84,24 @@ describe('tapi/links', () => {
       }),
     );
   });
+  it('createAccountLink -- no link type', async () => {
+    expect.assertions(1);
+    try {
+      // NOTE: THIS REQUEST DOES NOT RESULT IN 500 IN PRODUCTION
+      // THE NO LINK TYPE ERROR FAILS AND RETURNS 200
+      const { data } = await createAccountLink(accountId, 'bogus_type', uuid.v4());
+      expect(data).toStrictEqual(
+        expect.objectContaining({
+          statusCode: '101',
+        }),
+      );
+    } catch (e) {
+      // eslint-disable-next-line
+      expect(e.response.status).toEqual(500);
+    }
+  });
   it('createAccountLink -- success', async () => {
-    const { data } = await createAccountLink(accountId, 'bogus_type', uuid.v4());
+    const { data } = await createAccountLink(accountId, 'bogus_type', uuid.v4(), 'owner');
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',

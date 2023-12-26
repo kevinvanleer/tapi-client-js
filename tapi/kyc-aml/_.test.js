@@ -11,6 +11,7 @@ describe('kyc-aml', () => {
     );
   });
   it('performKycAml -- valid party', async () => {
+    console.log(global.partyId);
     const { data } = await performKycAml(global.partyId);
     expect(data.statusDesc).toEqual('Ok');
     expect(data).toStrictEqual(
