@@ -1,7 +1,7 @@
 const { createOffering, updateOffering, getAllOfferings, getOffering, deleteOffering } = require('.');
 
 describe('offerings', () => {
-  const issuerId = '1';
+  const issuerId = process.env.TAPI_TEST_ISSUER_ID;
   const offering = {
     issuerId,
     issueName: 'Test issue',

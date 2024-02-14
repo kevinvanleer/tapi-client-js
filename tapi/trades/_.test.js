@@ -1,6 +1,6 @@
 const { createTrade, editTrade, getAllTrades, getTrade, deleteTrade } = require('.');
 
-const { accounts, offerings, links, issuers } = require('..');
+const { accounts, offerings, links } = require('..');
 
 let offeringId;
 let accountId;
@@ -8,19 +8,20 @@ let accountId;
 jest.setTimeout(10000);
 
 const getIssuerId = async () => {
-  const { data } = await issuers.createIssuer({
+  /* const { data } = await issuers.createIssuer({
     issuerName: 'Test issuer',
     firstName: 'IssuerFirstName',
     lastName: 'IssuerLastName',
     email: 'issuer@email.com',
   });
   return data.issuerDetails[1][0].issuerId;
+   */
+  return process.env.TAPI_TEST_ISSUER_ID;
 };
 
 beforeAll(async () => {
   const { data: offering } = await offerings.createOffering({
-    // issuerId: await getIssuerId(),
-    issuerId: 1,
+    issuerId: await getIssuerId(),
     issueName: 'Test issue',
     issueType: 'Equity',
     minAmount: '1',
