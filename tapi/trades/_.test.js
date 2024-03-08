@@ -54,9 +54,9 @@ beforeAll(async () => {
   await links.linkAccountOwner(accountId, global.partyId);
 });
 
-afterAll(() => {
-  if (offeringId) offerings.deleteOffering(offeringId);
-  if (accountId) accounts.deleteAccount(accountId);
+afterAll(async () => {
+  if (offeringId) await offerings.deleteOffering(offeringId);
+  if (accountId) await accounts.deleteAccount(accountId);
 });
 
 describe('trades', () => {
