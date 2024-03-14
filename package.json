@@ -5,6 +5,7 @@
   "scripts": {
     "lint": "eslint --fix .",
     "seed": "NODE_ENV=test knex seed:run && node seeds/redis/populate-lists.mjs",
+    "seed:pop": "NODE_ENV=populate knex seed:run",
     "test": "NODE_ENV=test jest --runInBand",
     "test:qa": "source .env-tapi-qa && NODE_ENV=test jest --runInBand",
     "test:sandbox": "source .env-tapi-sandbox && NODE_ENV=test jest --runInBand",
