@@ -15,12 +15,14 @@ const updateAccount = (user) => put('/updateAccount', makeIndividualAccount(user
 const upsertAccount = (user) => (user.accountId ? updateAccount(user) : createAccount(user));
 
 const getAllAccounts = () => post('/getAllAccounts');
+const getAccount = (accountId) => post('/getAccount', { accountId });
 const deleteAccount = (accountId) => post('/deleteAccount', { accountId });
 
 module.exports = {
   createAccount,
   updateAccount,
   upsertAccount,
+  getAccount,
   getAllAccounts,
   deleteAccount,
 };

@@ -1,4 +1,4 @@
-const { createAccount, updateAccount, getAllAccounts, deleteAccount } = require('.');
+const { createAccount, updateAccount, getAccount, getAllAccounts, deleteAccount } = require('.');
 
 describe('accounts', () => {
   let createdAccountId;
@@ -34,6 +34,7 @@ describe('accounts', () => {
       zip_code: 500,
       date_of_birth: new Date(1970, 0, 1),
       country_iso_3: 'USA',
+      social_security_number: '123-45-6789',
       usa_citizenship_status: 'citizen',
     };
     const { data } = await createAccount(user);
@@ -46,6 +47,45 @@ describe('accounts', () => {
     );
     createdAccountId = data.accountDetails[0].accountId;
     expect(createdAccountId.startsWith('A')).toBe(true);
+  });
+  it('getAccount -- invalid ID', async () => {
+    const { data } = await getAccount('invalid-account-id');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
+  });
+  it('getAccount -- does not exist', async () => {
+    const { data } = await getAccount('A0000000');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '404',
+      }),
+    );
+  });
+  it('getAccount', async () => {
+    const account = {
+      accountId: createdAccountId,
+      email: 'testuser@test.test',
+      accountName: 'Test User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'AL',
+      zip: '00500',
+      country: 'USA',
+      taxID: '123-45-6789',
+      residentType: 'domestic_account',
+      type: 'individual',
+    };
+    const { data } = await getAccount(createdAccountId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        accountDetails: expect.objectContaining(account),
+      }),
+    );
   });
   it('updateAccount -- valid', async () => {
     expect(createdAccountId.startsWith('A')).toBe(true);
