@@ -39,6 +39,18 @@ const getFormattedDate = (date) =>
 
 const stateNameToAbbr = (name) => (usStateAbbr().includes(name) ? name : usStateAbbr()[usStateNames().indexOf(name)]);
 
+const hasRequiredFields = (fields, mapping) =>
+  mapping.map((m) => m[0]).reduce((acc, param) => acc && fields[param] != null, true);
+
+const norcap = (key, mapping) => mapping.find((m) => m[0] === key)[1];
+
+const convert = (fields, mapping) =>
+  Object.fromEntries(
+    Object.entries(fields)
+      .map(([k, v]) => [norcap(k, mapping), v])
+      .filter(([, v]) => v != null),
+  );
+
 module.exports = {
   tapi,
   tapiUri,
@@ -48,4 +60,7 @@ module.exports = {
   put,
   post,
   execute,
+  hasRequiredFields,
+  convert,
+  norcap,
 };
