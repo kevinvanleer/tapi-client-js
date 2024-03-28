@@ -1,25 +1,25 @@
-const { createParty, updateParty, getAllParties, deleteParty } = require('.');
-const { hasRequiredPartyFields } = require('./util');
+const { createParty, updateParty, getParty, getAllParties, deleteParty } = require('.');
+const { userToParty, hasRequiredPartyFields } = require('./util');
 
 jest.setTimeout(20000);
 
 describe('parties', () => {
   let createdPartyId;
+  const validUser = {
+    email: 'testuser@test.com',
+    first_name: 'Test',
+    last_name: 'User',
+    address1: '123 Main St',
+    city: 'Test City',
+    state: 'Alabama',
+    zip_code: 500,
+    date_of_birth: new Date(1970, 0, 1),
+    country_iso_3: 'USA',
+    usa_citizenship_status: 'citizen',
+  };
   it('createParty', async () => {
-    const user = {
-      email: 'testuser@test.com',
-      first_name: 'Test',
-      last_name: 'User',
-      address1: '123 Main St',
-      city: 'Test City',
-      state: 'Alabama',
-      zip_code: 500,
-      date_of_birth: new Date(1970, 0, 1),
-      country_iso_3: 'USA',
-      usa_citizenship_status: 'citizen',
-    };
-    expect(hasRequiredPartyFields(user)).toBe(true);
-    const { data } = await createParty(user);
+    expect(hasRequiredPartyFields(validUser)).toBe(true);
+    const { data } = await createParty(validUser);
     expect(data.statusDesc).toEqual('Ok');
     expect(data.statusCode).toEqual('101');
     const [, [partyDetails]] = data.partyDetails;
@@ -48,6 +48,35 @@ describe('parties', () => {
     const { data } = await createParty(user);
     expect(data.statusCode).toEqual('106');
   });
+  it('getParty -- invalid ID', async () => {
+    const { data } = await getParty('invalid-party-id');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '198',
+      }),
+    );
+  });
+  it('getParty -- does not exist', async () => {
+    const { data } = await getParty('P0000000');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '198',
+      }),
+    );
+  });
+  it('getParty', async () => {
+    const { data } = await getParty(createdPartyId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        partyDetails: [
+          expect.objectContaining({
+            ...userToParty({ ...validUser, partyId: createdPartyId }),
+          }),
+        ],
+      }),
+    );
+  });
   it('updateParty', async () => {
     const user = {
       partyId: createdPartyId,
@@ -58,14 +87,16 @@ describe('parties', () => {
       expect.objectContaining({
         statusDesc: 'Ok',
         statusCode: '101',
-      }),
-    );
-    const [, [partyDetails]] = data.partyDetails;
-    expect(partyDetails).toStrictEqual(
-      expect.objectContaining({
-        partyId: createdPartyId,
-        AMLstatus: null,
-        KYCstatus: null,
+        partyDetails: [
+          true,
+          [
+            expect.objectContaining({
+              partyId: createdPartyId,
+              AMLstatus: null,
+              KYCstatus: null,
+            }),
+          ],
+        ],
       }),
     );
   });
