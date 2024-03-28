@@ -17,6 +17,7 @@ const linkAccountIndividual = (accountId, partyId, linkType = 'member', primary 
   createAccountLink(accountId, 'IndivACParty', partyId, linkType, primary);
 const linkAccountOwner = (accountId, partyId) => createAccountLink(accountId, 'IndivACParty', partyId, 'owner', true);
 
+const getLink = (id) => post('/getLink', { id });
 const getAllLinks = (accountId) => post('/getAllLinks', { accountId });
 const deleteLink = (id) => post('/deleteLink', { id });
 
@@ -25,6 +26,7 @@ module.exports = {
   createAccountLink,
   linkAccountIndividual,
   linkAccountOwner,
+  getLink,
   getAllLinks,
   deleteLink,
 };

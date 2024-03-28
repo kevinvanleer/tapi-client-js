@@ -1,5 +1,5 @@
 const uuid = require('uuid');
-const { createLink, createAccountLink, linkAccountIndividual, linkAccountOwner, deleteLink, getAllLinks } = require('.');
+const { createLink, createAccountLink, linkAccountIndividual, linkAccountOwner, deleteLink, getLink, getAllLinks } = require('.');
 const { createAccount } = require('../accounts');
 const { createParty } = require('../parties');
 
@@ -169,6 +169,31 @@ describe('tapi/links', () => {
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '148',
+      }),
+    );
+  });
+  it('getLink -- invalid ID', async () => {
+    const { data } = await getLink('invalid-link-id');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
+  });
+  it('getLink -- does not exist', async () => {
+    const { data } = await getLink(linkId + 1);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '404',
+      }),
+    );
+  });
+  it('getLink -- success', async () => {
+    const { data } = await getLink(linkId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        linkDetails: expect.anything(),
       }),
     );
   });
