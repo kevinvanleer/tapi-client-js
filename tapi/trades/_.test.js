@@ -1,4 +1,4 @@
-const { createTrade, editTrade, getAllTrades, getTrade, deleteTrade } = require('.');
+const { createTrade, editTrade, getAllTrades, getTrade, getTradeStatus, deleteTrade } = require('.');
 
 const { accounts, offerings, links } = require('..');
 
@@ -129,6 +129,39 @@ describe('trades', () => {
         statusCode: '101',
         statusDesc: 'Ok',
         partyDetails: expect.arrayContaining([
+          expect.objectContaining({
+            orderId: createdTradeId,
+            orderStatus: 'CREATED',
+          }),
+        ]),
+      }),
+    );
+  });
+  it('getTradeStatus -- invalid trade ID', async () => {
+    const { data } = await getTradeStatus('invalid-trade-id');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '189',
+      }),
+    );
+  });
+  it('getTradeStatus -- does not exist', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
+    const { data } = await getTradeStatus(createdTradeId + 1);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '189',
+      }),
+    );
+  });
+  it('getTradeStatus -- success', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
+    const { data } = await getTradeStatus(createdTradeId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([
           expect.objectContaining({
             orderId: createdTradeId,
             orderStatus: 'CREATED',
