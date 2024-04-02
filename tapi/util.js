@@ -1,3 +1,4 @@
+const camelize = require('camelize');
 const axios = require('axios');
 const usStateAbbr = require('@stdlib/datasets-us-states-abbr');
 const usStateNames = require('@stdlib/datasets-us-states-names');
@@ -44,9 +45,9 @@ const hasRequiredFields = (fields, mapping) =>
 
 const norcap = (key, mapping) => mapping.find((m) => m[0] === key)[1];
 
-const convert = (fields, mapping) =>
+const convert = (requestBody, mapping) =>
   Object.fromEntries(
-    Object.entries(fields)
+    Object.entries(camelize(requestBody))
       .map(([k, v]) => [norcap(k, mapping), v])
       .filter(([, v]) => v != null),
   );
