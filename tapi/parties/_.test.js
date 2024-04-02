@@ -25,7 +25,7 @@ describe('parties', () => {
     const [, [partyDetails]] = data.partyDetails;
     expect(partyDetails).toStrictEqual(
       expect.objectContaining({
-        partyId: expect.anything(),
+        partyId: expect.stringMatching(/^P[0-9]{7,8}$/),
         AMLstatus: null,
         KYCstatus: null,
       }),
