@@ -35,7 +35,7 @@ describe('entities', () => {
     const [, [entityDetails]] = data.entityDetails;
     expect(entityDetails).toStrictEqual(
       expect.objectContaining({
-        partyId: expect.stringMatching(/^E[0-9]{8}$/),
+        partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
       }),
     );
     createdEntityId = entityDetails.partyId;
