@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily execution of North Capital Transact API tests
+Requires=norcap-tapi-api-test.service
+
+[Timer]
+Unit=norcap-tapi-api-test.service
+OnCalendar=*-*-* 22:00:00
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=Execute North Capital API tests and publish results to S3
+Wants=norcap-tapi-api-test.timer
+
+[Service]
+Type=oneshot
+User=kvl
+Group=staff
+WorkingDirectory=/home/kvl/src/north-capital/tapi-client-js
+ExecStart=/home/kvl/src/north-capital/tapi-client-js/run-tests.sh
+
+[Install]
+WantedBy=multi-user.target
