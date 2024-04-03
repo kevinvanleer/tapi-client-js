@@ -6,7 +6,6 @@ const {
   aws_s3_deployment: s3deploy,
   aws_cloudfront: cloudfront,
   RemovalPolicy,
-
 } = require('aws-cdk-lib');
 const path = require('path');
 
@@ -27,13 +26,13 @@ class TapiTestReportStack extends cdk.Stack {
     const oai = new cloudfront.OriginAccessIdentity(this, 'OriginAccessIdentity');
     websiteBucket.grantRead(oai);
 
-    websiteBucket.addToResourcePolicy(new iam.PolicyStatement({
-      actions: ['s3:GetObject'],
-      resources: [websiteBucket.arnForObjects('*')],
-      principals: [new iam.CanonicalUserPrincipal(
-        oai.cloudFrontOriginAccessIdentityS3CanonicalUserId,
-      )],
-    }));
+    websiteBucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        actions: ['s3:GetObject'],
+        resources: [websiteBucket.arnForObjects('*')],
+        principals: [new iam.CanonicalUserPrincipal(oai.cloudFrontOriginAccessIdentityS3CanonicalUserId)],
+      }),
+    );
 
     // Create a CloudFront distribution for the website
     const distribution = new cloudfront.Distribution(this, 'TapiTestReportDistribution', {

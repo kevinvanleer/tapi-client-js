@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Transact API Test Reports</h1>
+    <div class="spacer">
+    <h2>Latest</h2>
+    <div class="spacer">
+    {{#each this}} {{#contents}}
+    <div>
+      <a href="{{{name}}}/{{contents.[0].name}}/index.html">{{name}}</a>
+    </div>
+    {{/contents}} {{/each}}
+    </div>
+    </div>
+    <div class="spacer">
+    <h2>History</h2>
+    {{#each this}} {{#contents}}
+    <div class="spacer">
+    <h3>{{name}}</h3>
+    {{#contents}}
+      <div>
+        <a href="{{{../name}}}/{{{name}}}/index.html">{{name}}</a>
+      </div>
+    {{/contents}}
+    </div>
+    {{/contents}} {{/each}}
+    </div>
+  </body>
+</html>

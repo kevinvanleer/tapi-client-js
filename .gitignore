@@ -1,4 +1,4 @@
 node_modules
 .env*
-html-report/qa
-html-report/sandbox
+html-report
+!html-report/style.css
