@@ -52,7 +52,8 @@ describe('accounts', () => {
     const { data } = await getAccount('invalid-account-id');
     expect(data).toStrictEqual(
       expect.objectContaining({
-        statusCode: '106',
+        statusCode: '148',
+        statusDesc: 'Account is not exist/active.',
       }),
     );
   });
@@ -60,7 +61,8 @@ describe('accounts', () => {
     const { data } = await getAccount('A0000000');
     expect(data).toStrictEqual(
       expect.objectContaining({
-        statusCode: '404',
+        statusCode: '148',
+        statusDesc: 'Account is not exist/active.',
       }),
     );
   });
