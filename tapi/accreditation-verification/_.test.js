@@ -1,10 +1,4 @@
-const {
-  getDocumentList,
-  requestVerification,
-  updateVerification,
-  getVerificationStatus,
-  uploadVerificationDocument,
-} = require('.');
+const { requestVerification, getVerificationStatus, uploadVerificationDocument } = require('.');
 
 const { parties, accounts, links } = require('..');
 
@@ -19,7 +13,7 @@ const testFileNames = {
 
 jest.setTimeout(20000);
 
-describe('need more info', () => {
+describe('accrediation-verification/need more info', () => {
   let partyId;
   let accountId;
   let linkId;
@@ -67,7 +61,7 @@ describe('need more info', () => {
       }),
     );
   });
-  it('requestVerification -- TAPI sandbox bug', async () => {
+  it('requestVerification (requestAiVerification) -- TAPI sandbox bug', async () => {
     expect(typeof accountId).toBe('string');
     const response = await requestVerification(accountId);
     expect(response.data).toStrictEqual(
@@ -84,7 +78,7 @@ describe('need more info', () => {
       }),
     );
   });
-  it('getVerificationStatus -- pending', async () => {
+  it('getVerificationStatus (getAiRequest) -- pending', async () => {
     expect(typeof accountId).toBe('string');
     const response = await getVerificationStatus(accountId);
     expect(response.data).toStrictEqual(
@@ -111,7 +105,7 @@ describe('need more info', () => {
   });
 });
 
-describe('approved', () => {
+describe('accrediation-verification/approved', () => {
   let partyId;
   let accountId;
   let linkId;
@@ -159,7 +153,7 @@ describe('approved', () => {
       }),
     );
   });
-  it('requestVerification -- TAPI sandbox bug', async () => {
+  it('requestVerification (requestAiVerification) -- TAPI sandbox bug', async () => {
     expect(typeof accountId).toBe('string');
     const response = await requestVerification(accountId);
     expect(response.data).toStrictEqual(
@@ -176,7 +170,7 @@ describe('approved', () => {
       }),
     );
   });
-  it('getVerificationStatus -- pending', async () => {
+  it('getVerificationStatus (getAiRequest) -- pending', async () => {
     expect(typeof accountId).toBe('string');
     const response = await getVerificationStatus(accountId);
     expect(response.data).toStrictEqual(
@@ -203,7 +197,7 @@ describe('approved', () => {
   });
 });
 
-describe('rejected', () => {
+describe('accrediation-verification/rejected', () => {
   let partyId;
   let accountId;
   let linkId;
@@ -251,7 +245,7 @@ describe('rejected', () => {
       }),
     );
   });
-  it('requestVerification -- TAPI sandbox bug', async () => {
+  it('requestVerification (requestAiVerification) -- TAPI sandbox bug', async () => {
     expect(typeof accountId).toBe('string');
     const response = await requestVerification(accountId);
     expect(response.data).toStrictEqual(
@@ -268,7 +262,7 @@ describe('rejected', () => {
       }),
     );
   });
-  it('getVerificationStatus -- pending', async () => {
+  it('getVerificationStatus (getAiRequest) -- pending', async () => {
     expect(typeof accountId).toBe('string');
     const response = await getVerificationStatus(accountId);
     expect(response.data).toStrictEqual(

@@ -22,6 +22,7 @@ let partyId;
 let accountId;
 let linkId;
 let documentId;
+let jpgDocumentId;
 let aiRequestId;
 
 beforeAll(async () => {
@@ -54,11 +55,64 @@ afterAll(async () => {
 });
 
 describe('tapi/accreditation-verification', () => {
-  it('uploadVerificationDocument', async () => {
+  it('uploadVerificationDocument -- no account ID', async () => {
     expect(typeof accountId).toBe('string');
     const fakeFile = {
       buffer: Buffer.from('a'.repeat(1e3)),
       originalname: `${testFileNames.not_magic}.pdf`,
+    };
+    const response = await uploadVerificationDocument('', fakeFile);
+    expect(response.data).toStrictEqual({
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+      'Error(s)': '<br />accountIdu0026nbsp;u0026nbsp; : Missing',
+    });
+  });
+  it('uploadVerificationDocument -- invalid account ID', async () => {
+    expect(typeof accountId).toBe('string');
+    const fakeFile = {
+      buffer: Buffer.from('a'.repeat(1e3)),
+      originalname: `${testFileNames.not_magic}.pdf`,
+    };
+    const response = await uploadVerificationDocument('invalid-accounot-id', fakeFile);
+    expect(response.data).toStrictEqual({
+      statusCode: '148',
+      statusDesc: 'Account is not exist/active.',
+    });
+  });
+  it('uploadVerificationDocument -- file too small', async () => {
+    expect(typeof accountId).toBe('string');
+    const fakeFile = {
+      buffer: Buffer.from('a'.repeat(1e2)),
+      originalname: `${testFileNames.not_magic}.pdf`,
+    };
+    const response = await uploadVerificationDocument(accountId, fakeFile);
+    expect(response.data).toStrictEqual({
+      'Error(s)': 'Document File Size Must Be Greater Than 1 kb',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
+  });
+  it('uploadVerificationDocument -- pdf', async () => {
+    expect(typeof accountId).toBe('string');
+    const fakeFile = {
+      buffer: Buffer.from('a'.repeat(1e3)),
+      originalname: `${testFileNames.not_magic}.pdf`,
+    };
+    const response = await uploadVerificationDocument(accountId, fakeFile);
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        document_details: 'Document has been uploaded Successfully',
+      }),
+    );
+  });
+  it('uploadVerificationDocument -- jpg', async () => {
+    expect(typeof accountId).toBe('string');
+    const fakeFile = {
+      buffer: Buffer.from('a'.repeat(1e3)),
+      originalname: `${testFileNames.not_magic}.jpg`,
     };
     const response = await uploadVerificationDocument(accountId, fakeFile);
     expect(response.data).toStrictEqual(
@@ -155,24 +209,90 @@ describe('tapi/accreditation-verification', () => {
       }),
     );
     documentId = response.data.accreditedDetails.documents[0].documentid;
+    jpgDocumentId = response.data.accreditedDetails.documents[1].documentid;
   });
-  it('getDocumentList', async () => {
+  it('getDocumentList (getAiDocument) -- no account ID, no document ID', async () => {
+    const { data } = await getDocumentList();
+    expect(data).toStrictEqual({
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+      'Error(s)': '<br />accountId :u0026nbsp;u0026nbsp; : Missing',
+    });
+  });
+  it('getDocumentList (getAiDocument) -- no account ID', async () => {
+    const { data } = await getDocumentList(undefined, documentId);
+    expect(data).toStrictEqual({
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+      'Error(s)': '<br />accountId :u0026nbsp;u0026nbsp; : Missing',
+    });
+  });
+  it('getDocumentList (getAiDocument) -- invalid account ID', async () => {
+    const { data } = await getDocumentList('invalid-account-id');
+    expect(data).toStrictEqual({
+      statusCode: '148',
+      statusDesc: 'Account is not exist/active.',
+    });
+  });
+  it('getDocumentList (getAiDocument) -- no document ID', async () => {
+    expect(typeof accountId).toBe('string');
+    const response = await getDocumentList(accountId);
+    expect(response.data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: [
+        {
+          documentid: documentId,
+          accountId,
+          documentTitle: `documentTitle0="${testFileNames.not_magic}.pdf"`,
+          documentFileName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
+          documentUrl: expect.any(String),
+          createdDate: expect.any(String),
+          documentFileReferenceCode: expect.stringMatching(/^[0-9]{12}$/),
+          id: expect.stringMatching(/^[0-9]{6}$/),
+        },
+        {
+          documentid: jpgDocumentId,
+          accountId,
+          documentTitle: `documentTitle0="${testFileNames.not_magic}.jpg"`,
+          documentFileName: expect.stringMatching(/^[a-zA-Z0-9]*.jpg$/),
+          documentUrl: expect.any(String),
+          createdDate: expect.any(String),
+          documentFileReferenceCode: expect.stringMatching(/^[0-9]{12}$/),
+          id: expect.stringMatching(/^[0-9]{6}$/),
+        },
+      ],
+    });
+  });
+  it('getDocumentList (getAiDocument) -- invalid document ID', async () => {
+    expect(typeof accountId).toBe('string');
+    const response = await getDocumentList(accountId, 'invalid-document-id');
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '233',
+        statusDesc: 'No AI document found for this account',
+      }),
+    );
+  });
+  it('getDocumentList (getAiDocument)', async () => {
     expect(typeof accountId).toBe('string');
     expect(typeof documentId).toBe('string');
     const response = await getDocumentList(accountId, documentId);
-    expect(response.data).toStrictEqual(
-      expect.objectContaining({
-        statusCode: '101',
-        document_details: expect.arrayContaining([
-          expect.objectContaining({
-            documentid: documentId,
-            accountId,
-            documentTitle: `documentTitle0="${testFileNames.not_magic}.pdf"`,
-            documentFileName: expect.anything(),
-            documentUrl: expect.anything(),
-          }),
-        ]),
-      }),
-    );
+    expect(response.data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: [
+        {
+          documentid: documentId,
+          accountId,
+          documentTitle: `documentTitle0="${testFileNames.not_magic}.pdf"`,
+          documentFileName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
+          documentUrl: expect.any(String),
+          createdDate: expect.any(String),
+          documentFileReferenceCode: expect.stringMatching(/^[0-9]{12}$/),
+          id: expect.stringMatching(/^[0-9]{6}$/),
+        },
+      ],
+    });
   });
 });
