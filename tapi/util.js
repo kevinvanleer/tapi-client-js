@@ -4,6 +4,7 @@ const usStateAbbr = require('@stdlib/datasets-us-states-abbr');
 const usStateNames = require('@stdlib/datasets-us-states-names');
 
 const apiHost = process.env.TAPI_HOST || 'https://api-sandboxdash.norcapsecurities.com';
+const serverlessHost = apiHost.replace('api', 'tapi');
 const tapiUriSegment = 'tapiv3/index.php/v3';
 const tapiUri = `${apiHost}/${tapiUriSegment}`;
 // const mimeType = 'application/x-www-form-urlencoded';
@@ -18,8 +19,22 @@ const tapi = axios.create({
   },
 });
 
+/* Extra debug information
+tapi.interceptors.request.use(
+  function (config) {
+    // Do something before request is sent
+    console.log(config);
+    return config;
+  },
+  function (error) {
+    // Do something with request error
+    return Promise.reject(error);
+  },
+);
+*/
 tapi.interceptors.response.use((response) => {
   if (response.data.developerAPIKey) console.log('CONTAINS API KEY');
+  // console.log(response);
   return response;
 });
 if (process.env.TAPI_CLIENT_ID == null)
@@ -31,8 +46,8 @@ const auth = {
   developerAPIKey: process.env.TAPI_API_KEY,
 };
 
-const put = (command, payload) => tapi.put(command, { ...auth, ...payload });
-const post = (command, payload) => tapi.post(command, { ...auth, ...payload });
+const put = (command, payload, config) => tapi.put(command, { ...auth, ...payload }, config);
+const post = (command, payload, config) => tapi.post(command, { ...auth, ...payload }, config);
 const execute = (command, payload) => (command.startsWith('create') ? put(command, payload) : post(command, payload));
 
 const getFormattedDate = (date) =>
@@ -53,6 +68,7 @@ const convert = (requestBody, mapping) =>
   );
 
 module.exports = {
+  serverlessHost,
   tapi,
   tapiUri,
   auth,
