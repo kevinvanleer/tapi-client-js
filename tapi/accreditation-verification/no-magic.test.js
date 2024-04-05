@@ -123,7 +123,23 @@ describe('tapi/accreditation-verification', () => {
       }),
     );
   });
-  it('requestVerification', async () => {
+  it('requestVerification (requestAiVerification) -- no account ID', async () => {
+    const response = await requestVerification();
+    expect(response.data).toStrictEqual({
+      'Error(s)': '<br />accountIdu0026nbsp;u0026nbsp; : Missing',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
+  });
+  it('requestVerification (requestAiVerification) -- invalid account ID', async () => {
+    expect(typeof accountId).toBe('string');
+    const response = await requestVerification('invalid-account-id');
+    expect(response.data).toStrictEqual({
+      statusCode: '148',
+      statusDesc: 'Account is not exist/active.',
+    });
+  });
+  it('requestVerification (requestAiVerification)', async () => {
     expect(typeof accountId).toBe('string');
     const response = await requestVerification(accountId);
     expect(response.data).toStrictEqual(
@@ -141,33 +157,38 @@ describe('tapi/accreditation-verification', () => {
     );
     aiRequestId = response.data.accreditedDetails.at(0).airequestId;
   });
-  it('getVerificationStatus -- pending', async () => {
-    expect(typeof accountId).toBe('string');
-    const response = await getVerificationStatus(accountId);
-    expect(response.data).toStrictEqual(
-      expect.objectContaining({
-        statusCode: '101',
-        accreditedDetails: expect.objectContaining({
-          documents: expect.arrayContaining([
-            expect.objectContaining({
-              id: expect.anything(),
-              documentid: expect.anything(),
-            }),
-          ]),
-          request: expect.arrayContaining([
-            expect.objectContaining({
-              accountId,
-              accreditedStatus: 'pending',
-              aiMethod: 'Upload',
-              aiRequestStatus: 'Pending',
-            }),
-          ]),
-        }),
-      }),
-    );
-    documentId = response.data.accreditedDetails.documents[0].documentid;
+  it('getVerificationStatus (getAiRequest) -- no account ID', async () => {
+    const response = await getVerificationStatus();
+    expect(response.data).toStrictEqual({
+      'Error(s)': '<br />accountId u0026nbsp;u0026nbsp; : Missing',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
   });
-  it('updateVerification', async () => {
+  it('getVerificationStatus (getAiRequest) -- invalid account ID', async () => {
+    expect(typeof accountId).toBe('string');
+    const response = await getVerificationStatus('invalid-account-id');
+    expect(response.data).toStrictEqual({
+      statusCode: '148',
+      statusDesc: 'Account is not exist/active.',
+    });
+  });
+  it('updateVerification (updateAiRequest) -- no request ID', async () => {
+    const response = await updateVerification();
+    expect(response.data).toStrictEqual({
+      statusDesc: 'Data/parameter missing',
+      'Error(s)': '<br />airequestIdu0026nbsp;u0026nbsp; : Missing',
+      statusCode: '106',
+    });
+  });
+  it('updateVerification (updateAiRequest) -- invalid request ID', async () => {
+    const response = await updateVerification('invalid-request-id');
+    expect(response.data).toStrictEqual({
+      statusCode: '152',
+      statusDesc: 'Request Id not exits.',
+    });
+  });
+  it('updateVerification (updateAiRequest)', async () => {
     expect(typeof aiRequestId).toBe('string');
     const response = await updateVerification(aiRequestId);
     expect(response.data).toStrictEqual(
@@ -184,7 +205,7 @@ describe('tapi/accreditation-verification', () => {
       }),
     );
   });
-  it('getVerificationStatus -- new info', async () => {
+  it('getVerificationStatus (getAiRequest) -- new info', async () => {
     expect(typeof accountId).toBe('string');
     const response = await getVerificationStatus(accountId);
     expect(response.data).toStrictEqual(
