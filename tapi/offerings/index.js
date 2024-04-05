@@ -10,10 +10,13 @@ const updateOffering = (offering) => post('/updateOffering', { ...offering });
 
 const deleteOffering = (offeringId) => post('/deleteOffering', { offeringId });
 
+const getTrades = (offeringId) => post('/getTradesForOffering', { offeringId });
+
 module.exports = {
   getOffering,
   createOffering,
   updateOffering,
   getAllOfferings,
+  getTrades,
   deleteOffering,
 };
