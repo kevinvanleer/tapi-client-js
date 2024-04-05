@@ -7,21 +7,9 @@ let accountId;
 
 jest.setTimeout(10000);
 
-const getIssuerId = async () => {
-  /* const { data } = await issuers.createIssuer({
-    issuerName: 'Test issuer',
-    firstName: 'IssuerFirstName',
-    lastName: 'IssuerLastName',
-    email: 'issuer@email.com',
-  });
-  return data.issuerDetails[1][0].issuerId;
-   */
-  return process.env.TAPI_TEST_ISSUER_ID;
-};
-
 beforeAll(async () => {
   const { data: offering } = await offerings.createOffering({
-    issuerId: await getIssuerId(),
+    issuerId: process.env.TAPI_TEST_ISSUER_ID,
     issueName: 'Test issue',
     issueType: 'Equity',
     minAmount: '1',
@@ -102,6 +90,46 @@ describe('trades', () => {
     createdTradeId = data.purchaseDetails[1][0].tradeId;
     expect(createdTradeId).toMatch(/[0-9]+/);
   });
+  it('editTrade -- no account ID', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
+    const updatedTrade = {
+      offeringId,
+      tradeId: createdTradeId,
+      shares: '2',
+    };
+    const { data } = await editTrade(updatedTrade);
+    expect(data).toStrictEqual({
+      statusCode: '190',
+      statusDesc: 'Trade status should be in CREATED',
+    });
+  });
+  it('editTrade -- no trade ID', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
+    const updatedTrade = {
+      offeringId,
+      accountId,
+      shares: '2',
+    };
+    const { data } = await editTrade(updatedTrade);
+    expect(data).toStrictEqual({
+      statusCode: '190',
+      statusDesc: 'Trade status should be in CREATED',
+    });
+  });
+  it('editTrade -- invalid trade ID', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
+    const updatedTrade = {
+      offeringId,
+      accountId,
+      tradeId: 'invalid-trade-id',
+      shares: '2',
+    };
+    const { data } = await editTrade(updatedTrade);
+    expect(data).toStrictEqual({
+      statusCode: '190',
+      statusDesc: 'Trade status should be in CREATED',
+    });
+  });
   it('editTrade -- valid', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
     const updatedTrade = {
@@ -120,6 +148,30 @@ describe('trades', () => {
         }),
       }),
     );
+  });
+  it('getTrade -- no ID', async () => {
+    const { data } = await getTrade();
+    expect(data).toStrictEqual({
+      'Error(s)': 'accountId MISSING',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
+  });
+  it('getTrade -- invalid ID nonnumeric', async () => {
+    const { data } = await getTrade('invalid-trade-id');
+    expect(data).toStrictEqual({
+      'Error(s)': 'accountId MISSING',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
+  });
+  it('getTrade -- invalid ID numeric', async () => {
+    const { data } = await getTrade(123.4123);
+    expect(data).toStrictEqual({
+      'Error(s)': 'accountId MISSING',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
   });
   it('getTrade -- success', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
@@ -184,6 +236,30 @@ describe('trades', () => {
         ]),
       }),
     );
+  });
+  it('deleteTrade -- no ID', async () => {
+    const { data } = await deleteTrade();
+    expect(data).toStrictEqual({
+      'Error(s)': '<br />tradeIdu0026nbsp;u0026nbsp; : Missing<br />accountIdu0026nbsp;u0026nbsp; : Missing',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
+  });
+  it('deleteTrade -- invalid ID nonnumeric', async () => {
+    const { data } = await deleteTrade('invalid-trade-id');
+    expect(data).toStrictEqual({
+      'Error(s)': '<br />accountIdu0026nbsp;u0026nbsp; : Missing',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
+  });
+  it('deleteTrade -- invalid ID numeric', async () => {
+    const { data } = await deleteTrade(123.4123);
+    expect(data).toStrictEqual({
+      'Error(s)': '<br />accountIdu0026nbsp;u0026nbsp; : Missing',
+      statusCode: '106',
+      statusDesc: 'Data/parameter missing',
+    });
   });
   it('deleteTrade -- success', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
