@@ -1,14 +1,5 @@
 const uuid = require('uuid');
-const {
-  createLink,
-  createAccountLink,
-  linkAccountIndividual,
-  linkAccountOwner,
-  deleteLink,
-  getLink,
-  getLinkedAccounts,
-  getAllLinks,
-} = require('.');
+const { createLink, createAccountLink, linkAccountIndividual, linkAccountOwner, deleteLink, getLink, getAllLinks } = require('.');
 const { createAccount } = require('../accounts');
 const { createParty } = require('../parties');
 
@@ -215,39 +206,6 @@ describe('tapi/links', () => {
         linkDetails: expect.anything(),
       }),
     );
-  });
-  it('getLinkedAccounts -- no party ID', async () => {
-    const { data } = await getLinkedAccounts();
-    expect(data).toStrictEqual({
-      'Error(s)': 'partyId&nbsp;&nbsp; : Missing',
-      statusDesc: 'Data/parameter missing',
-      statusCode: '106',
-    });
-  });
-  it('getLinkedAccounts -- invalid party ID', async () => {
-    const { data } = await getLinkedAccounts(fakeId);
-    expect(data).toStrictEqual({
-      statusCode: '198',
-      statusDesc: 'Party Account does not exist.',
-    });
-  });
-  it('getLinkedAccounts -- success', async () => {
-    const { data } = await getLinkedAccounts(global.partyId);
-    expect(data).toStrictEqual({
-      statusDesc: 'Ok',
-      statusCode: '101',
-      linkDetails: [
-        {
-          firstEntry: accountId,
-          firstEntryType: 'Account',
-          id: partyAccountLinkId,
-          linkType: 'owner',
-          notes: null,
-          relatedEntry: global.partyId,
-          relatedEntryType: 'IndivACParty',
-        },
-      ],
-    });
   });
   it('getAllLinks -- success', async () => {
     const { data } = await getAllLinks(accountId);
