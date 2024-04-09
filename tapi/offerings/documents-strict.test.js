@@ -99,6 +99,7 @@ describe('offerings/documents', () => {
           offeringId,
           documentFileReferenceCode: '0000000',
           documentId: expect.stringMatching(/^[0-9]{4,5}$/),
+          documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentURL: expect.stringMatching(
             /^https:\/\/api-sandboxdash.norcapsecurities.com\/admin_v3\/Upload_documentation\/uploadDocument\/[a-zA-Z0-9]*$/,
           ),
