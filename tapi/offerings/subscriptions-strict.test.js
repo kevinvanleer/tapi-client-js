@@ -3,7 +3,7 @@ const { addSubscriptions, getSubscriptions } = require('.');
 
 jest.setTimeout(10000);
 
-describe('offerings/subscriptions', () => {
+describe('offerings/subscriptions-strict', () => {
   let createdTradeId;
   let offeringId;
   let accountId;

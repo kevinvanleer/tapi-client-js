@@ -3,7 +3,7 @@ const { addDocuments, getDocuments } = require('.');
 
 jest.setTimeout(10000);
 
-describe('offerings/documents', () => {
+describe('offerings/documents-strict', () => {
   let createdTradeId;
   let offeringId;
   let accountId;
