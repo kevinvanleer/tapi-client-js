@@ -3,6 +3,16 @@ const { addSubscriptions, getSubscriptions } = require('.');
 
 jest.setTimeout(10000);
 
+/* NOTE
+ *
+ * These tests rely on configuration outside the test environment. The client used to execute the tests must be linked to Docusign.
+ * The linked docusign account must have templates:
+ * - tapi-sandbox-test-subscription-0
+ * - tapi-sandbox-test-subscription-1
+ * - tapi-sandbox-test-subscription-2
+ *
+ *   TODO: This test suite needs access to a client account that is not linked to docusign.
+ */
 describe('offerings/subscriptions', () => {
   let offeringId;
 
@@ -60,6 +70,21 @@ describe('offerings/subscriptions', () => {
       document_details: 'Template details does not exist.',
       statusDesc: 'Error(s)',
     });
+  });
+  it('addSubscriptions (addSubscriptionsForOffering) -- template does not exist', async () => {
+    const { data } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-does-not-exist');
+    expect(data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: [
+        {
+          offeringId,
+          templateName: null,
+          templateNameID: expect.any(Number),
+        },
+      ],
+    });
+    expect(data.document_details[0].templateNameID.toString()).toStrictEqual(expect.stringMatching(/^[0-9]{6}$/));
   });
   it('addSubscriptions (addSubscriptionsForOffering)', async () => {
     const { data } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-0');

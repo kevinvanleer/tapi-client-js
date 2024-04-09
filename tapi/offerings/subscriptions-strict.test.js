@@ -86,6 +86,14 @@ describe('offerings/subscriptions-strict', () => {
       document_details: [],
     });
   });
+  it('addSubscriptions (addSubscriptionsForOffering) -- template does not exist', async () => {
+    const { data } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-does-not-exist');
+    expect(data).toStrictEqual({
+      statusCode: '404',
+      statusDesc: 'Docusign template does not exist.',
+    });
+    expect(data.document_details[0].templateNameID.toString()).toStrictEqual(expect.stringMatching(/^[0-9]{6}$/));
+  });
   it('addSubscriptions (addSubscriptionsForOffering)', async () => {
     const docusignTemplate = 'tapi-sandbox-test-subscription-0';
     const { data } = await addSubscriptions(offeringId, docusignTemplate);
