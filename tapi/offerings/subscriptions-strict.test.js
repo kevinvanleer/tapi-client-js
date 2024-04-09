@@ -1,5 +1,5 @@
 const { accounts, offerings, links, trades } = require('..');
-const { getSubscriptions } = require('.');
+const { addSubscriptions, getSubscriptions } = require('.');
 
 jest.setTimeout(10000);
 
@@ -58,7 +58,7 @@ describe('offerings/subscriptions', () => {
   it('getSubscriptions (getSubscriptionsForOffering) -- no offering ID', async () => {
     const { data } = await getSubscriptions();
     expect(data).toStrictEqual({
-      'Error(s)': 'offeringIdu0026nbsp;u0026nbsp; : Missing',
+      'Error(s)': '<br />offeringIdu0026nbsp;u0026nbsp; : Missing',
       statusCode: '106',
       statusDesc: 'Data/parameter missing',
     });
@@ -86,12 +86,74 @@ describe('offerings/subscriptions', () => {
       document_details: [],
     });
   });
+  it('addSubscriptions (addSubscriptionsForOffering)', async () => {
+    const docusignTemplate = 'tapi-sandbox-test-subscription-0';
+    const { data } = await addSubscriptions(offeringId, docusignTemplate);
+    expect(data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: [
+        {
+          offeringId,
+          templateName: expect.any(String),
+          templateId: expect.stringMatching(/^[0-9]{6}$/),
+          templateUrl: expect.stringMatching(
+            new RegExp(`^https://api-sandboxdash.norcapsecurities.com/tapiv3/uploads/${docusignTemplate}[_a-zA-Z0-9]*.pdf$`),
+          ),
+        },
+      ],
+    });
+  });
   it('getSubscriptions (getSubscriptionsForOffering) -- one item', async () => {
     const { data } = await getSubscriptions(offeringId);
     expect(data).toStrictEqual({
       statusCode: '101',
       statusDesc: 'Ok',
-      document_details: [],
+      document_details: [
+        {
+          createdDate: expect.any(String),
+          offeringId,
+          templateId: expect.stringMatching(/^[0-9]{6}$/),
+          templateName: 'tapi-sandbox-test-subscription-0',
+          templateUrl: expect.stringMatching(
+            /^https:\/\/api-sandboxdash.norcapsecurities.com\/tapiv3\/uploads\/tapi-sandbox-test-subscription-0[_a-zA-Z0-9]*.pdf$/,
+          ),
+        },
+      ],
+    });
+  });
+  it('getSubscriptions (getSubscriptionsForOffering) -- three items', async () => {
+    const { data: doc1 } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-1');
+    const { data: doc2 } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-2');
+    const { data } = await getSubscriptions(offeringId);
+    expect(data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: [
+        {
+          createdDate: expect.any(String),
+          offeringId,
+          templateId: expect.stringMatching(/^[0-9]{6}$/),
+          templateName: 'tapi-sandbox-test-subscription-0',
+          templateUrl: expect.stringMatching(
+            /^https:\/\/api-sandboxdash.norcapsecurities.com\/tapiv3\/uploads\/tapi-sandbox-test-subscription-0[_a-zA-Z0-9]*.pdf$/,
+          ),
+        },
+        {
+          createdDate: expect.any(String),
+          offeringId,
+          templateId: doc1.document_details[0].templateId,
+          templateName: doc1.document_details[0].templateName,
+          templateUrl: doc1.document_details[0].templateUrl,
+        },
+        {
+          createdDate: expect.any(String),
+          offeringId,
+          templateId: doc2.document_details[0].templateId,
+          templateName: doc2.document_details[0].templateName,
+          templateUrl: doc2.document_details[0].templateUrl,
+        },
+      ],
     });
   });
 });
