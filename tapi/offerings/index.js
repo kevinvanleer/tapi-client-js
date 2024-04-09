@@ -14,6 +14,8 @@ const updateOffering = (offering) => post('/updateOffering', { ...offering });
 const deleteOffering = (offeringId) => post('/deleteOffering', { offeringId });
 
 const getTrades = (offeringId) => post('/getTradesForOffering', { offeringId });
+const addSubscriptions = (offeringId, fileName) =>
+  post('/addSubscriptionsForOffering', { offeringId, file_name: `templatename0=${fileName}` });
 const getSubscriptions = (offeringId) => post('/getSubscriptionsForOffering', { offeringId });
 const getDocuments = (offeringId) => post('/getDocumentsForOffering', { offeringId });
 
@@ -39,6 +41,7 @@ module.exports = {
   updateOffering,
   getAllOfferings,
   getTrades,
+  addSubscriptions,
   getSubscriptions,
   addDocuments,
   getDocuments,
