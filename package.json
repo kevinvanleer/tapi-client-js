@@ -4,8 +4,6 @@
   "private": true,
   "scripts": {
     "lint": "eslint --fix .",
-    "seed": "NODE_ENV=test knex seed:run && node seeds/redis/populate-lists.mjs",
-    "seed:pop": "NODE_ENV=populate knex seed:run",
     "test": "NODE_ENV=test jest --runInBand",
     "test:qa": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-qa && NODE_ENV=test jest --runInBand",
     "test:sandbox": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-sandbox && NODE_ENV=test jest --runInBand",
@@ -29,7 +27,6 @@
     "hbs-cli": "^1.4.1",
     "http-errors": "~2.0.0",
     "jest-html-reporters": "^3.1.4",
-    "knex": "^3.0.1",
     "lodash": "^4.17.21",
     "morgan": "~1.10.0",
     "mysql2": "^3.6.5",
