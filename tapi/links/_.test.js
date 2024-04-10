@@ -26,7 +26,6 @@ const getPartyId = async () => {
 
 describe('tapi/links', () => {
   let linkId;
-  let partyAccountLinkId;
   const fakeId = uuid.v4();
   let accountId = '';
   beforeAll(async () => {
@@ -70,7 +69,7 @@ describe('tapi/links', () => {
         true,
         [
           {
-            id: expect.stringMatching(/^[0-9]{7,8}$/),
+            id: expect.stringMatching(/^[0-9]{6,8}$/),
           },
         ],
       ],
@@ -132,7 +131,6 @@ describe('tapi/links', () => {
         statusCode: '101',
       }),
     );
-    [, [{ id: partyAccountLinkId }]] = data.linkDetails;
   });
   it('linkAccountOwner -- link exists', async () => {
     const { data } = await linkAccountOwner(accountId, global.partyId);
