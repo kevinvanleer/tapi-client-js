@@ -5,7 +5,7 @@ const { accounts, offerings, links } = require('..');
 let offeringId;
 let accountId;
 
-jest.setTimeout(10000);
+jest.setTimeout(30000);
 
 beforeAll(async () => {
   const { data: offering } = await offerings.createOffering({

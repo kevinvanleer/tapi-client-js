@@ -231,7 +231,7 @@ describe('tapi/links', () => {
     );
   });
   it('deleteLink -- does not exist', async () => {
-    const { data } = await deleteLink(1);
+    const { data } = await deleteLink(linkId + 1);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '404',

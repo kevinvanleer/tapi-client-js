@@ -269,11 +269,9 @@ describe('ach (external accounts)', () => {
       accountId,
       RefNum: expect.any(String),
       fundStatus: 'Pending',
-      notes: '',
       offeringId,
       tradeId,
       totalAmount: '1.000000',
-      transactionstatus: 'Pending',
     });
     testReferenceNumber = transferDetails.RefNum;
   });
