@@ -1,4 +1,4 @@
-const { createParty, updateParty, getParty, getAllParties, deleteParty } = require('.');
+const { createParty, updateParty, getParty, getAllParties, deleteParty, uploadPartyDocument } = require('.');
 const { userToParty, hasRequiredPartyFields } = require('./util');
 
 jest.setTimeout(20000);
@@ -97,6 +97,22 @@ describe('parties', () => {
             }),
           ],
         ],
+      }),
+    );
+  });
+
+  it('uploadPartyDocument', async () => {
+    expect(typeof createdPartyId).toBe('string');
+    const fakeFile = {
+      buffer: Buffer.from('a'.repeat(1e3)),
+      originalname: `test-party-file.pdf`,
+    };
+    const response = await uploadPartyDocument(createdPartyId, fakeFile);
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        document_details: 'Document has been uploaded Successfully',
       }),
     );
   });

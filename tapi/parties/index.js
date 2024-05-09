@@ -1,5 +1,7 @@
+const FormData = require('form-data');
+const { Readable } = require('stream');
 const { userToParty } = require('./util');
-const { put, post, serverlessHost } = require('../util');
+const { tapi, auth, put, post, serverlessHost } = require('../util');
 
 const createParty = (user) => put('/createParty', userToParty(user));
 
@@ -13,6 +15,20 @@ const upsertParty = (user) => (user.partyId ? updateParty(user) : createParty(us
 
 const getLinkedAccounts = (partyId) => post('/getLinkedAccounts', { partyId }, { baseURL: serverlessHost });
 
+const uploadPartyDocument = (partyId, file) => {
+  const data = new FormData();
+  data.append('clientID', auth.clientID);
+  data.append('developerAPIKey', auth.developerAPIKey);
+  data.append('partyId', partyId);
+  data.append('file_name', `filename0="${file.originalname}"`);
+  data.append('documentTitle', `documentTitle0="${file.originalname}"`);
+  data.append('userfile0', Readable.from(file.buffer), { filename: file.originalname });
+  return tapi.post('/uploadPartyDocument', data, {
+    timeout: 60000,
+    headers: { ...data.getHeaders() },
+  });
+};
+
 module.exports = {
   createParty,
   updateParty,
@@ -21,4 +37,5 @@ module.exports = {
   getAllParties,
   getLinkedAccounts,
   deleteParty,
+  uploadPartyDocument,
 };
