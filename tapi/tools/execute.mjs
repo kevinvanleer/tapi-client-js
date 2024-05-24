@@ -1,7 +1,11 @@
-import { execute } from '../util.js';
+import curlirize from 'axios-curlirize';
+import { tapi, execute } from '../util.js';
 
-let command;
+curlirize(tapi);
+
 let payload = {};
+let command;
+
 process.argv.forEach((val, index, array) => {
   if (val.endsWith('execute.mjs')) {
     command = array[index + 1];
