@@ -29,6 +29,8 @@ const uploadPartyDocument = (partyId, file) => {
   });
 };
 
+const getPartyDocument = (partyId, documentId) => post('/getPartyDocument', { partyId, documentId });
+
 module.exports = {
   createParty,
   updateParty,
@@ -38,4 +40,5 @@ module.exports = {
   getLinkedAccounts,
   deleteParty,
   uploadPartyDocument,
+  getPartyDocument,
 };

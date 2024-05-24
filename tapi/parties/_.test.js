@@ -1,4 +1,4 @@
-const { createParty, updateParty, getParty, getAllParties, deleteParty, uploadPartyDocument } = require('.');
+const { createParty, updateParty, getParty, getAllParties, deleteParty, uploadPartyDocument, getPartyDocument } = require('.');
 const { userToParty, hasRequiredPartyFields } = require('./util');
 
 jest.setTimeout(20000);
@@ -101,6 +101,7 @@ describe('parties', () => {
     );
   });
 
+  let documentId;
   it('uploadPartyDocument', async () => {
     expect(typeof createdPartyId).toBe('string');
     const fakeFile = {
@@ -113,6 +114,51 @@ describe('parties', () => {
         statusCode: '101',
         statusDesc: 'Ok',
         document_details: 'Document has been uploaded Successfully',
+      }),
+    );
+    documentId = response.data.document_details[0].documentId;
+  });
+
+  it('getPartyDocument -- no document ID', async () => {
+    const response = await getPartyDocument(createdPartyId);
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        partyDocumentDetails: expect.arrayContaining([
+          expect.objectContaining({
+            createdDate: expect.any(String),
+            documentFileName: expect.any(String),
+            documentFileReferenceCode: expect.any(String),
+            documentTitle: expect.any(String),
+            documentUrl: expect.any(String),
+            documentid: expect.any(String),
+            id: expect.any(String),
+            partyid: createdPartyId,
+          }),
+        ]),
+      }),
+    );
+  });
+
+  it('getPartyDocument', async () => {
+    const response = await getPartyDocument(createdPartyId, documentId);
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        partyDocumentDetails: expect.arrayContaining([
+          expect.objectContaining({
+            createdDate: expect.any(String),
+            documentFileName: expect.any(String),
+            documentFileReferenceCode: expect.any(String),
+            documentTitle: expect.any(String),
+            documentUrl: expect.any(String),
+            documentid: expect.any(String),
+            id: expect.any(String),
+            partyid: createdPartyId,
+          }),
+        ]),
       }),
     );
   });
