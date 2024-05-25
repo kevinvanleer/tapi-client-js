@@ -46,6 +46,7 @@ if (process.env.TAPI_CLIENT_ID == null)
   console.warn('WARNING: TAPI client is not defined. Check your environment configuration.');
 if (process.env.TAPI_API_KEY == null) console.warn('WARNING: TAPI API key is not defined. Check your environment configuration.');
 
+const get = (command, payload, config) => tapi.get(command, { params: { ...payload }, ...config });
 const put = (command, payload, config) => tapi.put(command, { ...auth, ...payload }, config);
 const post = (command, payload, config) => tapi.post(command, { ...auth, ...payload }, config);
 const execute = (command, payload) => (command.startsWith('create') ? put(command, payload) : post(command, payload));
@@ -74,6 +75,7 @@ module.exports = {
   auth,
   getFormattedDate,
   stateNameToAbbr,
+  get,
   put,
   post,
   execute,
