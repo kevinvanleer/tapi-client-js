@@ -10,10 +10,15 @@ const tapiUri = `${apiHost}/${tapiUriSegment}`;
 // const mimeType = 'application/x-www-form-urlencoded';
 const mimeType = 'application/json';
 
+const auth = {
+  clientID: process.env.TAPI_CLIENT_ID,
+  developerAPIKey: process.env.TAPI_API_KEY,
+};
+
 const tapi = axios.create({
   baseURL: tapiUri,
   timeout: 60000,
-  headers: { accept: mimeType, 'content-type': mimeType },
+  headers: { accept: mimeType, 'content-type': mimeType, Authorization: `Bearer ${auth.clientID}:${auth.developerAPIKey}` },
   validateStatus(status) {
     return status >= 200 && status < 500; // default
   },
@@ -40,11 +45,6 @@ tapi.interceptors.response.use((response) => {
 if (process.env.TAPI_CLIENT_ID == null)
   console.warn('WARNING: TAPI client is not defined. Check your environment configuration.');
 if (process.env.TAPI_API_KEY == null) console.warn('WARNING: TAPI API key is not defined. Check your environment configuration.');
-
-const auth = {
-  clientID: process.env.TAPI_CLIENT_ID,
-  developerAPIKey: process.env.TAPI_API_KEY,
-};
 
 const put = (command, payload, config) => tapi.put(command, { ...auth, ...payload }, config);
 const post = (command, payload, config) => tapi.post(command, { ...auth, ...payload }, config);
