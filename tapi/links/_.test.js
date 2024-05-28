@@ -44,6 +44,14 @@ describe('tapi/links', () => {
     const { data: accountData } = await createAccount(user);
     accountId = accountData.accountDetails[0].accountId;
   });
+  it('createLink -- no link type', async () => {
+    const response = await createLink('not_account', 'asdf', 'bogus_type', 'some_string');
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
+  });
   it('createLink -- first entry not account', async () => {
     const response = await createLink('not_account', 'asdf', 'bogus_type', 'some_string', 'a', false);
     expect(response.data).toStrictEqual(
@@ -85,7 +93,7 @@ describe('tapi/links', () => {
     );
   });
   it('createAccountLink -- link exists', async () => {
-    const { data } = await createAccountLink(accountId, 'bogus_type', fakeId);
+    const { data } = await createAccountLink(accountId, 'bogus_type', fakeId, 'a', false);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '206',
@@ -93,20 +101,12 @@ describe('tapi/links', () => {
     );
   });
   it('createAccountLink -- no link type', async () => {
-    expect.assertions(1);
-    try {
-      // NOTE: THIS REQUEST DOES NOT RESULT IN 500 IN PRODUCTION
-      // THE NO LINK TYPE ERROR FAILS AND RETURNS 200
-      const { data } = await createAccountLink(accountId, 'bogus_type', uuid.v4());
-      expect(data).toStrictEqual(
-        expect.objectContaining({
-          statusCode: '101',
-        }),
-      );
-    } catch (e) {
-      // eslint-disable-next-line
-      expect(e.response.status).toEqual(500);
-    }
+    const { data } = await createAccountLink(accountId, 'bogus_type', uuid.v4());
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+      }),
+    );
   });
   it('createAccountLink -- success', async () => {
     const { data } = await createAccountLink(accountId, 'bogus_type', uuid.v4(), 'owner');
