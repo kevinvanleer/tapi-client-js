@@ -1,4 +1,4 @@
-const { createEntity, updateEntity, getEntity, getEntities, deleteEntity } = require('.');
+const { createEntity, updateEntity, getEntity, getEntities, getEntitiesPost, deleteEntity } = require('.');
 
 jest.setTimeout(20000);
 
@@ -262,6 +262,47 @@ describe('entities', () => {
     const offset = 0;
 
     const { data } = await getEntities({ offset, limit, deleted: true });
+    let parties = data.partyDetails;
+
+    if (data.pagination.totalRecords <= limit) {
+      jest.fail('There is not more than one page of data');
+    }
+
+    const responses = await Promise.all(
+      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
+        getEntities({ offset: (i + 1) * limit, limit, deleted: true }),
+      ),
+    );
+
+    responses.forEach((r) => {
+      expect(r.data.statusCode).toStrictEqual('101');
+      parties = parties.concat(r.data.partyDetails);
+    });
+
+    expect(parties).toHaveLength(data.pagination.totalRecords);
+
+    expect(parties).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          partyId: createdEntityId,
+          partystatus: 'Active',
+          createdDate: expect.any(String),
+          updatedDate: expect.any(String),
+        }),
+        expect.objectContaining({
+          partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+          partystatus: 'Archived',
+          createdDate: expect.any(String),
+          updatedDate: expect.any(String),
+        }),
+      ]),
+    );
+  });
+  it('getEntities -- POST get all parties w/ deleted', async () => {
+    const limit = 50;
+    const offset = 0;
+
+    const { data } = await getEntitiesPost({ offset, limit, deleted: true });
     let parties = data.partyDetails;
 
     if (data.pagination.totalRecords <= limit) {
