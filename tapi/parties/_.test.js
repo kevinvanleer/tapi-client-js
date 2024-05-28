@@ -3,6 +3,7 @@ const {
   updateParty,
   getParty,
   getParties,
+  getPartiesPost,
   getAllParties,
   deleteParty,
   uploadPartyDocument,
@@ -400,7 +401,7 @@ describe('parties', () => {
     expect(parties).toStrictEqual(
       expect.arrayContaining([
         {
-          partyId: createdPartyId,
+          partyId: expect.stringMatching(/^P[0-9]{7,8}$/),
           amlDate: null,
           amlStatus: null,
           associatedPerson: null,
@@ -498,7 +499,132 @@ describe('parties', () => {
       ]),
     );
   });
-  it('getAllParties', async () => {
+  it('getParties -- POST get all parties w/ deleted', async () => {
+    const limit = 50;
+    const offset = 0;
+
+    const { data } = await getPartiesPost({ offset, limit, deleted: true });
+    let parties = data.partyDetails;
+
+    if (data.pagination.totalRecords <= limit) {
+      jest.fail('There is not more than one page of data');
+    }
+
+    const responses = await Promise.all(
+      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
+        getPartiesPost({ offset: (i + 1) * limit, limit, deleted: true }),
+      ),
+    );
+
+    responses.forEach((r) => {
+      expect(r.data.statusCode).toStrictEqual('101');
+      parties = parties.concat(r.data.partyDetails);
+    });
+
+    expect(parties).toHaveLength(data.pagination.totalRecords);
+
+    expect(parties).toStrictEqual(
+      expect.arrayContaining([
+        {
+          partyId: expect.stringMatching(/^P[0-9]{7,8}$/),
+          amlDate: null,
+          amlStatus: null,
+          associatedPerson: null,
+          avgAnnIncome: null,
+          avgHouseholdIncome: null,
+          createdDate: expect.any(String),
+          currentAnnIncome: null,
+          currentHouseholdIncome: null,
+          dob: '01-01-1970',
+          documentKey: '',
+          domicile: 'U.S. citizen',
+          emailAddress: 'testuser@test.com',
+          emailAddress2: '',
+          empAddress1: '',
+          empAddress2: '',
+          empCity: '',
+          empCountry: '',
+          empName: '',
+          empState: '',
+          empStatus: null,
+          empZip: null,
+          esignStatus: 'NOTSIGNED',
+          field1: '',
+          field2: '',
+          field3: '',
+          firstName: 'Test',
+          householdNetworth: null,
+          invest_to: null,
+          kycStatus: null,
+          lastName: 'User',
+          middleInitial: null,
+          notes: '',
+          occupation: '',
+          partystatus: 'Active',
+          phone: null,
+          phone2: null,
+          primAddress1: '123 Main St',
+          primAddress2: '',
+          primCity: expect.any(String),
+          primCountry: 'USA',
+          primState: 'AL',
+          primZip: '00500',
+          socialSecurityNumber: '',
+          tags: '',
+          updatedDate: expect.any(String),
+        },
+        {
+          partyId: expect.stringMatching(/^P[0-9]{7,8}$/),
+          amlDate: null,
+          amlStatus: null,
+          associatedPerson: null,
+          avgAnnIncome: null,
+          avgHouseholdIncome: null,
+          createdDate: expect.any(String),
+          currentAnnIncome: null,
+          currentHouseholdIncome: null,
+          dob: '01-01-1970',
+          documentKey: '',
+          domicile: 'U.S. citizen',
+          emailAddress: 'testuser@test.com',
+          emailAddress2: '',
+          empAddress1: '',
+          empAddress2: '',
+          empCity: '',
+          empCountry: '',
+          empName: '',
+          empState: '',
+          empStatus: null,
+          empZip: null,
+          esignStatus: 'NOTSIGNED',
+          field1: '',
+          field2: '',
+          field3: '',
+          firstName: 'Test',
+          householdNetworth: null,
+          invest_to: null,
+          kycStatus: null,
+          lastName: 'User',
+          middleInitial: null,
+          notes: '',
+          occupation: '',
+          partystatus: 'Archived',
+          phone: null,
+          phone2: null,
+          primAddress1: '123 Main St',
+          primAddress2: '',
+          primCity: expect.any(String),
+          primCountry: 'USA',
+          primState: 'AL',
+          primZip: '00500',
+          socialSecurityNumber: '',
+          tags: '',
+          updatedDate: expect.any(String),
+        },
+      ]),
+    );
+  });
+  it('getAllParties -- default', async () => {
     const { data } = await getAllParties();
     expect(data).toStrictEqual(
       expect.objectContaining({
@@ -553,6 +679,10 @@ describe('parties', () => {
             updatedDate: expect.any(String),
           },
           expect.objectContaining({
+            partyId: expect.stringMatching(/^[PE][0-9]{7,8}$/),
+            partystatus: 'Archived',
+          }),
+          expect.objectContaining({
             partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
             createdDate: expect.any(String),
             formationDate: expect.any(String),
@@ -570,6 +700,35 @@ describe('parties', () => {
       }),
     );
   });
+  it('getAllParties -- with pagination', async () => {
+    const { data } = await getAllParties(0, 10);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        partyDetails: expect.arrayContaining([
+          expect.objectContaining({
+            partyId: expect.stringMatching(/^[PE][0-9]{7,8}$/),
+            amlDate: null,
+            amlStatus: null,
+            associatedPerson: null,
+            avgAnnIncome: null,
+            avgHouseholdIncome: null,
+            createdDate: expect.any(String),
+            currentAnnIncome: null,
+            currentHouseholdIncome: null,
+            primAddress1: expect.any(String),
+            primCity: expect.any(String),
+            primCountry: expect.any(String),
+            primState: expect.any(String),
+            primZip: expect.any(String),
+            updatedDate: expect.any(String),
+          }),
+        ]),
+      }),
+    );
+    expect(data.partyDetails).toHaveLength(10);
+  });
+
   it('deleteParty -- does not exist', async () => {
     const { data } = await deleteParty('fake-party-id');
     expect(data).toStrictEqual(

@@ -7,8 +7,9 @@ const createParty = (user) => put('/createParty', userToParty(user));
 
 const updateParty = (user) => post('/updateParty', userToParty(user));
 
-const getAllParties = () => post('/getAllParties');
-const getParties = ({ offset, limit, deleted }) => get('/parties', { offset, limit, deleted });
+const getAllParties = (offset, limit, deleted) => post('/getAllParties', { offset, limit, deleted });
+const getPartiesGet = ({ offset, limit, deleted }) => get('/parties', { offset, limit, deleted });
+const getPartiesPost = ({ offset, limit, deleted }) => post('/getParties', { offset, limit, deleted });
 const getParty = (partyId) => post('/getParty', { partyId });
 const deleteParty = (partyId) => post('/deleteParty', { partyId });
 
@@ -38,7 +39,9 @@ module.exports = {
   upsertParty,
   getParty,
   getAllParties,
-  getParties,
+  getParties: getPartiesGet,
+  getPartiesGet,
+  getPartiesPost,
   getLinkedAccounts,
   deleteParty,
   uploadPartyDocument,
