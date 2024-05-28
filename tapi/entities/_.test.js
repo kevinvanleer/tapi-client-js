@@ -1,4 +1,4 @@
-const { createEntity, updateEntity, getEntity, deleteEntity } = require('.');
+const { createEntity, updateEntity, getEntity, getEntities, deleteEntity } = require('.');
 
 jest.setTimeout(20000);
 
@@ -104,6 +104,196 @@ describe('entities', () => {
           partyId: createdEntityId,
           AMLstatus: 'Pending',
           KYCstatus: 'Pending',
+        }),
+      ]),
+    );
+  });
+  it('getEntities -- default', async () => {
+    const { data } = await getEntities({});
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        partyDetails: expect.arrayContaining([
+          expect.objectContaining({
+            partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+            createdDate: expect.any(String),
+            primAddress1: expect.any(String),
+            primCity: expect.any(String),
+            primCountry: expect.any(String),
+            primState: expect.any(String),
+            primZip: expect.any(String),
+            updatedDate: expect.any(String),
+          }),
+        ]),
+      }),
+    );
+    expect(data.partyDetails).toHaveLength(10);
+  });
+
+  it('getEntities -- offset NaN', async () => {
+    const { data } = await getEntities({ offset: 'start', limit: 10 });
+    expect(data.partyDetails).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '240',
+        partyDetails: [],
+      }),
+    );
+  });
+  it('getEntities -- limit NaN', async () => {
+    const { data } = await getEntities({ offset: 0, limit: 'none' });
+    expect(data.partyDetails).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '240',
+        partyDetails: [],
+      }),
+    );
+  });
+  it('getEntities -- offset out of range high', async () => {
+    const { data } = await getEntities({ offset: 1e7, limit: 10 });
+    expect(data.partyDetails).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '239',
+        partyDetails: [],
+      }),
+    );
+  });
+  it('getEntities -- offset out of range low', async () => {
+    const { data } = await getEntities({ offset: -1, limit: 10 });
+    expect(data.partyDetails).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '239',
+        partyDetails: [],
+      }),
+    );
+  });
+  it('getEntities -- limit out of range high', async () => {
+    const { data } = await getEntities({ offset: 10, limit: 10000 });
+    expect(data.partyDetails).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '239',
+        partyDetails: [],
+      }),
+    );
+  });
+  it('getEntities -- limit out of range low', async () => {
+    const { data } = await getEntities({ offset: 10, limit: 0 });
+    expect(data.partyDetails).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '239',
+        partyDetails: [],
+      }),
+    );
+  });
+
+  it('getEntities -- offset:1,limit:2', async () => {
+    const { data } = await getEntities({ offset: 1, limit: 2 });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        partyDetails: expect.arrayContaining([
+          expect.objectContaining({
+            partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+            createdDate: expect.any(String),
+            primAddress1: expect.any(String),
+            primCity: expect.any(String),
+            primCountry: expect.any(String),
+            primState: expect.any(String),
+            primZip: expect.any(String),
+            updatedDate: expect.any(String),
+          }),
+        ]),
+        pagination: expect.objectContaining({
+          totalRecords: expect.any(Number),
+          startIndex: 1,
+          endIndex: 3,
+        }),
+      }),
+    );
+    expect(data.partyDetails).toHaveLength(2);
+  });
+  it('getEntities -- get all parties', async () => {
+    const limit = 50;
+    const offset = 0;
+
+    const { data } = await getEntities({ offset, limit });
+    let parties = data.partyDetails;
+
+    if (data.pagination.totalRecords <= limit) {
+      jest.fail('There is not more than one page of data');
+    }
+
+    const responses = await Promise.all(
+      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
+        getEntities({ offset: (i + 1) * limit, limit }),
+      ),
+    );
+
+    responses.forEach((r) => {
+      expect(r.data.statusCode).toStrictEqual('101');
+      parties = parties.concat(r.data.partyDetails);
+    });
+
+    expect(parties).toHaveLength(data.pagination.totalRecords);
+
+    expect(parties).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+          createdDate: expect.any(String),
+          primAddress1: expect.any(String),
+          primCity: expect.any(String),
+          primCountry: expect.any(String),
+          primState: expect.any(String),
+          primZip: expect.any(String),
+          updatedDate: expect.any(String),
+        }),
+      ]),
+    );
+  });
+  it('getEntities -- get all parties w/ deleted', async () => {
+    const limit = 50;
+    const offset = 0;
+
+    const { data } = await getEntities({ offset, limit, deleted: true });
+    let parties = data.partyDetails;
+
+    if (data.pagination.totalRecords <= limit) {
+      jest.fail('There is not more than one page of data');
+    }
+
+    const responses = await Promise.all(
+      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
+        getEntities({ offset: (i + 1) * limit, limit, deleted: true }),
+      ),
+    );
+
+    responses.forEach((r) => {
+      expect(r.data.statusCode).toStrictEqual('101');
+      parties = parties.concat(r.data.partyDetails);
+    });
+
+    expect(parties).toHaveLength(data.pagination.totalRecords);
+
+    expect(parties).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          partyId: createdEntityId,
+          partystatus: 'Active',
+          createdDate: expect.any(String),
+          updatedDate: expect.any(String),
+        }),
+        expect.objectContaining({
+          partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+          partystatus: 'Archived',
+          createdDate: expect.any(String),
+          updatedDate: expect.any(String),
         }),
       ]),
     );
