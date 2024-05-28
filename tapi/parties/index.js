@@ -1,13 +1,14 @@
 const FormData = require('form-data');
 const { Readable } = require('stream');
 const { userToParty } = require('./util');
-const { tapi, auth, put, post, serverlessHost } = require('../util');
+const { tapi, auth, put, post, get, serverlessHost } = require('../util');
 
 const createParty = (user) => put('/createParty', userToParty(user));
 
 const updateParty = (user) => post('/updateParty', userToParty(user));
 
 const getAllParties = () => post('/getAllParties');
+const getParties = ({ offset, limit, deleted }) => get('/parties', { offset, limit, deleted });
 const getParty = (partyId) => post('/getParty', { partyId });
 const deleteParty = (partyId) => post('/deleteParty', { partyId });
 
@@ -37,6 +38,7 @@ module.exports = {
   upsertParty,
   getParty,
   getAllParties,
+  getParties,
   getLinkedAccounts,
   deleteParty,
   uploadPartyDocument,
