@@ -113,7 +113,7 @@ describe('entities', () => {
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',
-        partyDetails: expect.arrayContaining([
+        entityDetails: expect.arrayContaining([
           expect.objectContaining({
             partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
             createdDate: expect.any(String),
@@ -127,66 +127,66 @@ describe('entities', () => {
         ]),
       }),
     );
-    expect(data.partyDetails).toHaveLength(10);
+    expect(data.entityDetails).toHaveLength(10);
   });
 
   it('getEntities -- offset NaN', async () => {
     const { data } = await getEntities({ offset: 'start', limit: 10 });
-    expect(data.partyDetails).toHaveLength(0);
+    expect(data.entityDetails).toHaveLength(0);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '240',
-        partyDetails: [],
+        entityDetails: [],
       }),
     );
   });
   it('getEntities -- limit NaN', async () => {
     const { data } = await getEntities({ offset: 0, limit: 'none' });
-    expect(data.partyDetails).toHaveLength(0);
+    expect(data.entityDetails).toHaveLength(0);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '240',
-        partyDetails: [],
+        entityDetails: [],
       }),
     );
   });
   it('getEntities -- offset out of range high', async () => {
     const { data } = await getEntities({ offset: 1e7, limit: 10 });
-    expect(data.partyDetails).toHaveLength(0);
+    expect(data.entityDetails).toHaveLength(0);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '239',
-        partyDetails: [],
+        entityDetails: [],
       }),
     );
   });
   it('getEntities -- offset out of range low', async () => {
     const { data } = await getEntities({ offset: -1, limit: 10 });
-    expect(data.partyDetails).toHaveLength(0);
+    expect(data.entityDetails).toHaveLength(0);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '239',
-        partyDetails: [],
+        entityDetails: [],
       }),
     );
   });
   it('getEntities -- limit out of range high', async () => {
     const { data } = await getEntities({ offset: 10, limit: 10000 });
-    expect(data.partyDetails).toHaveLength(0);
+    expect(data.entityDetails).toHaveLength(0);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '239',
-        partyDetails: [],
+        entityDetails: [],
       }),
     );
   });
   it('getEntities -- limit out of range low', async () => {
     const { data } = await getEntities({ offset: 10, limit: 0 });
-    expect(data.partyDetails).toHaveLength(0);
+    expect(data.entityDetails).toHaveLength(0);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '239',
-        partyDetails: [],
+        entityDetails: [],
       }),
     );
   });
@@ -197,7 +197,7 @@ describe('entities', () => {
       expect.objectContaining({
         statusCode: '101',
         statusDesc: 'Ok',
-        partyDetails: expect.arrayContaining([
+        entityDetails: expect.arrayContaining([
           expect.objectContaining({
             partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
             createdDate: expect.any(String),
@@ -216,14 +216,14 @@ describe('entities', () => {
         }),
       }),
     );
-    expect(data.partyDetails).toHaveLength(2);
+    expect(data.entityDetails).toHaveLength(2);
   });
-  it('getEntities -- get all parties', async () => {
+  it('getEntities -- get all entities', async () => {
     const limit = 50;
     const offset = 0;
 
     const { data } = await getEntities({ offset, limit });
-    let parties = data.partyDetails;
+    let entities = data.entityDetails;
 
     if (data.pagination.totalRecords <= limit) {
       jest.fail('There is not more than one page of data');
@@ -237,12 +237,12 @@ describe('entities', () => {
 
     responses.forEach((r) => {
       expect(r.data.statusCode).toStrictEqual('101');
-      parties = parties.concat(r.data.partyDetails);
+      entities = entities.concat(r.data.entityDetails);
     });
 
-    expect(parties).toHaveLength(data.pagination.totalRecords);
+    expect(entities).toHaveLength(data.pagination.totalRecords);
 
-    expect(parties).toStrictEqual(
+    expect(entities).toStrictEqual(
       expect.arrayContaining([
         expect.objectContaining({
           partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
@@ -257,12 +257,12 @@ describe('entities', () => {
       ]),
     );
   });
-  it('getEntities -- get all parties w/ deleted', async () => {
+  it('getEntities -- get all entities w/ deleted', async () => {
     const limit = 50;
     const offset = 0;
 
     const { data } = await getEntities({ offset, limit, deleted: true });
-    let parties = data.partyDetails;
+    let entities = data.entityDetails;
 
     if (data.pagination.totalRecords <= limit) {
       jest.fail('There is not more than one page of data');
@@ -276,12 +276,12 @@ describe('entities', () => {
 
     responses.forEach((r) => {
       expect(r.data.statusCode).toStrictEqual('101');
-      parties = parties.concat(r.data.partyDetails);
+      entities = entities.concat(r.data.entityDetails);
     });
 
-    expect(parties).toHaveLength(data.pagination.totalRecords);
+    expect(entities).toHaveLength(data.pagination.totalRecords);
 
-    expect(parties).toStrictEqual(
+    expect(entities).toStrictEqual(
       expect.arrayContaining([
         expect.objectContaining({
           partyId: createdEntityId,
@@ -298,12 +298,12 @@ describe('entities', () => {
       ]),
     );
   });
-  it('getEntities -- POST get all parties w/ deleted', async () => {
+  it('getEntities -- POST get all entities w/ deleted', async () => {
     const limit = 50;
     const offset = 0;
 
     const { data } = await getEntitiesPost({ offset, limit, deleted: true });
-    let parties = data.partyDetails;
+    let entities = data.entityDetails;
 
     if (data.pagination.totalRecords <= limit) {
       jest.fail('There is not more than one page of data');
@@ -317,12 +317,12 @@ describe('entities', () => {
 
     responses.forEach((r) => {
       expect(r.data.statusCode).toStrictEqual('101');
-      parties = parties.concat(r.data.partyDetails);
+      entities = entities.concat(r.data.entityDetails);
     });
 
-    expect(parties).toHaveLength(data.pagination.totalRecords);
+    expect(entities).toHaveLength(data.pagination.totalRecords);
 
-    expect(parties).toStrictEqual(
+    expect(entities).toStrictEqual(
       expect.arrayContaining([
         expect.objectContaining({
           partyId: createdEntityId,
