@@ -262,6 +262,16 @@ describe('parties', () => {
       }),
     );
   });
+  it('getParties -- invalid type', async () => {
+    const { data } = await getParties({ type: 'invalid' });
+    expect(data.partyDetails).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '240',
+        partyDetails: [],
+      }),
+    );
+  });
 
   it('getParties -- offset:1,limit:2', async () => {
     const { data } = await getParties({ offset: 1, limit: 2 });
