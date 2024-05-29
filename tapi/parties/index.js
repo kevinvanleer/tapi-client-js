@@ -8,8 +8,8 @@ const createParty = (user) => put('/createParty', userToParty(user));
 const updateParty = (user) => post('/updateParty', userToParty(user));
 
 const getAllParties = (offset, limit, deleted) => post('/getAllParties', { offset, limit, deleted });
-const getPartiesGet = ({ offset, limit, deleted }) => get('/parties', { offset, limit, deleted });
-const getPartiesPost = ({ offset, limit, deleted }) => post('/getParties', { offset, limit, deleted });
+const getPartiesGet = ({ offset, limit, deleted, type }) => get('/parties', { offset, limit, deleted, type });
+const getPartiesPost = ({ offset, limit, deleted, type }) => post('/getParties', { offset, limit, deleted, type });
 const getParty = (partyId) => post('/getParty', { partyId });
 const deleteParty = (partyId) => post('/deleteParty', { partyId });
 

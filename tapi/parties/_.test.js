@@ -297,6 +297,67 @@ describe('parties', () => {
     );
     expect(data.partyDetails).toHaveLength(2);
   });
+  it('getParties -- offset:1,limit:2,type:individual', async () => {
+    const { data } = await getParties({ offset: 1, limit: 2, type: 'individual' });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        partyDetails: expect.arrayContaining([
+          expect.objectContaining({
+            partyId: expect.stringMatching(/^P[0-9]{7,8}$/),
+            amlDate: null,
+            amlStatus: null,
+            associatedPerson: null,
+            avgAnnIncome: null,
+            avgHouseholdIncome: null,
+            createdDate: expect.any(String),
+            currentAnnIncome: null,
+            currentHouseholdIncome: null,
+            primAddress1: expect.any(String),
+            primCity: expect.any(String),
+            primCountry: expect.any(String),
+            primState: expect.any(String),
+            primZip: expect.any(String),
+            updatedDate: expect.any(String),
+          }),
+        ]),
+        pagination: expect.objectContaining({
+          totalRecords: expect.any(Number),
+          startIndex: 1,
+          endIndex: 3,
+        }),
+      }),
+    );
+    expect(data.partyDetails).toHaveLength(2);
+  });
+  it('getParties -- offset:1,limit:2,type:entity', async () => {
+    const { data } = await getParties({ offset: 1, limit: 2, type: 'entity' });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        entityDetails: expect.arrayContaining([
+          expect.objectContaining({
+            partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+            createdDate: expect.any(String),
+            updatedDate: expect.any(String),
+            primAddress1: expect.any(String),
+            primCity: expect.any(String),
+            primCountry: expect.any(String),
+            primState: expect.any(String),
+            primZip: expect.any(String),
+          }),
+        ]),
+        pagination: expect.objectContaining({
+          totalRecords: expect.any(Number),
+          startIndex: 1,
+          endIndex: 3,
+        }),
+      }),
+    );
+    expect(data.entityDetails).toHaveLength(2);
+  });
   it('getParties -- get all parties', async () => {
     const limit = 50;
     const offset = 0;
