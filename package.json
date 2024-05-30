@@ -5,9 +5,10 @@
   "scripts": {
     "lint": "eslint --fix .",
     "test": "NODE_ENV=test jest --runInBand",
+    "test:dev": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-dev && NODE_ENV=test jest --runInBand",
     "test:qa": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-qa && NODE_ENV=test jest --runInBand",
     "test:sandbox": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-sandbox && NODE_ENV=test jest --runInBand",
-    "test:all": "npm run test:qa ; npm run test:sandbox",
+    "test:all": "npm run test:dev ; npm run test:qa ; npm run test:sandbox",
     "tapi": "node ./tapi/tools/execute.mjs",
     "upload-test-report": "aws s3 sync ./html-report/ s3://tapitestreportstack-tapitestreportbucket4eea3b17-c8jwb9b43yqk/",
     "invalidate-test-report": "aws cloudfront create-invalidation --distribution-id E1DQQHLZFTPAHA --paths '/*'",
