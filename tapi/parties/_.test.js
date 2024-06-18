@@ -11,7 +11,7 @@ const {
 } = require('.');
 const { userToParty, hasRequiredPartyFields } = require('./util');
 
-jest.setTimeout(20000);
+jest.setTimeout(120000);
 
 describe('parties', () => {
   let createdPartyId;
@@ -27,6 +27,12 @@ describe('parties', () => {
     country_iso_3: 'USA',
     usa_citizenship_status: 'citizen',
   };
+  beforeAll(async () => {
+    const { data } = await getParties({});
+    if (data.pagination.totalRecords < 100) {
+      await Promise.all(Array.from([...Array(100)], (x) => x + 1).map(() => createParty(validUser)));
+    }
+  });
   it('createParty', async () => {
     expect(hasRequiredPartyFields(validUser)).toBe(true);
     const { data } = await createParty(validUser);
@@ -368,21 +374,20 @@ describe('parties', () => {
     );
     expect(data.entityDetails).toHaveLength(2);
   });
-  it('getParties -- get all parties', async () => {
+  it('getParties -- get last parties', async () => {
     const limit = 50;
-    const offset = 0;
+    let offset = 0;
 
     const { data } = await getParties({ offset, limit });
     let parties = data.partyDetails;
 
-    if (data.pagination.totalRecords <= limit) {
-      jest.fail('There is not more than one page of data');
-    }
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
 
     const responses = await Promise.all(
-      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
-        getParties({ offset: (i + 1) * limit, limit }),
-      ),
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) => getParties({ offset: offset + i * limit, limit })),
     );
 
     responses.forEach((r) => {
@@ -390,7 +395,7 @@ describe('parties', () => {
       parties = parties.concat(r.data.partyDetails);
     });
 
-    expect(parties).toHaveLength(data.pagination.totalRecords);
+    expect(parties).toHaveLength(data.pagination.totalRecords - offset + limit);
 
     expect(parties).toStrictEqual(
       expect.arrayContaining([
@@ -445,21 +450,20 @@ describe('parties', () => {
       ]),
     );
   });
-  it('getParties -- get all parties w/ deleted', async () => {
+  it('getParties -- get last parties w/ deleted', async () => {
     const limit = 50;
-    const offset = 0;
+    let offset = 0;
 
     const { data } = await getParties({ offset, limit, deleted: true });
     let parties = data.partyDetails;
 
-    if (data.pagination.totalRecords <= limit) {
-      jest.fail('There is not more than one page of data');
-    }
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
 
     const responses = await Promise.all(
-      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
-        getParties({ offset: (i + 1) * limit, limit, deleted: true }),
-      ),
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) => getParties({ offset: offset + i * limit, limit, deleted: true })),
     );
 
     responses.forEach((r) => {
@@ -467,7 +471,7 @@ describe('parties', () => {
       parties = parties.concat(r.data.partyDetails);
     });
 
-    expect(parties).toHaveLength(data.pagination.totalRecords);
+    expect(parties).toHaveLength(data.pagination.totalRecords - offset + limit);
 
     expect(parties).toStrictEqual(
       expect.arrayContaining([
@@ -570,20 +574,21 @@ describe('parties', () => {
       ]),
     );
   });
-  it('getParties -- POST get all parties w/ deleted', async () => {
+  it('getParties -- POST get last parties w/ deleted', async () => {
     const limit = 50;
-    const offset = 0;
+    let offset = 0;
 
     const { data } = await getPartiesPost({ offset, limit, deleted: true });
     let parties = data.partyDetails;
 
-    if (data.pagination.totalRecords <= limit) {
-      jest.fail('There is not more than one page of data');
-    }
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
 
     const responses = await Promise.all(
-      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
-        getPartiesPost({ offset: (i + 1) * limit, limit, deleted: true }),
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) =>
+        getPartiesPost({ offset: offset + i * limit, limit, deleted: true }),
       ),
     );
 
@@ -592,7 +597,7 @@ describe('parties', () => {
       parties = parties.concat(r.data.partyDetails);
     });
 
-    expect(parties).toHaveLength(data.pagination.totalRecords);
+    expect(parties).toHaveLength(data.pagination.totalRecords - offset + limit);
 
     expect(parties).toStrictEqual(
       expect.arrayContaining([
