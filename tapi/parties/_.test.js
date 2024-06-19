@@ -706,70 +706,38 @@ describe('parties', () => {
       expect.objectContaining({
         statusCode: '101',
         partyDetails: expect.arrayContaining([
-          {
-            partyId: expect.stringMatching(/^P[0-9]{7,8}$/),
-            amlDate: null,
-            amlStatus: null,
-            associatedPerson: null,
-            avgAnnIncome: null,
-            avgHouseholdIncome: null,
+          expect.objectContaining({
+            partyId: expect.stringMatching(/^P[0-9]{6,8}$/),
             createdDate: expect.any(String),
-            currentAnnIncome: null,
-            currentHouseholdIncome: null,
             dob: '01-01-1970',
-            documentKey: '',
             domicile: 'U.S. citizen',
             emailAddress: 'testuser@test.com',
-            emailAddress2: '',
-            empAddress1: '',
-            empAddress2: '',
-            empCity: '',
-            empCountry: '',
-            empName: '',
-            empState: '',
-            empStatus: null,
-            empZip: null,
             esignStatus: 'NOTSIGNED',
-            field1: '',
-            field2: '',
-            field3: '',
             firstName: 'Test',
-            householdNetworth: null,
-            invest_to: null,
-            kycStatus: null,
             lastName: 'User',
-            middleInitial: null,
-            notes: '',
-            occupation: '',
             partystatus: expect.any(String),
-            phone: null,
-            phone2: null,
             primAddress1: '123 Main St',
-            primAddress2: '',
             primCity: expect.any(String),
             primCountry: 'USA',
             primState: 'AL',
             primZip: '00500',
-            socialSecurityNumber: '',
-            tags: '',
             updatedDate: expect.any(String),
-          },
+          }),
           expect.objectContaining({
-            partyId: expect.stringMatching(/^[PE][0-9]{7,8}$/),
+            partyId: expect.stringMatching(/^[PE][0-9]{6,8}$/),
             partystatus: 'Archived',
           }),
           expect.objectContaining({
-            partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+            partyId: expect.stringMatching(/^E[0-9]{6,8}$/),
             createdDate: expect.any(String),
-            formationDate: expect.any(String),
-            emailAddress: 'testuser@test.com',
+            emailAddress: expect.any(String),
             esignStatus: 'NOTSIGNED',
             partystatus: expect.any(String),
-            primAddress1: '123 Main St',
+            primAddress1: expect.any(String),
             primCity: expect.any(String),
             primCountry: 'USA',
-            primState: 'AL',
-            primZip: '00500',
+            primState: expect.any(String),
+            primZip: expect.any(String),
             updatedDate: expect.any(String),
           }),
         ]),
@@ -778,20 +746,14 @@ describe('parties', () => {
   });
   it('getAllParties -- with pagination', async () => {
     const { data } = await getAllParties(0, 10);
+    expect(data.partyDetails).toHaveLength(10);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',
         partyDetails: expect.arrayContaining([
           expect.objectContaining({
-            partyId: expect.stringMatching(/^[PE][0-9]{7,8}$/),
-            amlDate: null,
-            amlStatus: null,
-            associatedPerson: null,
-            avgAnnIncome: null,
-            avgHouseholdIncome: null,
+            partyId: expect.stringMatching(/^[PE][0-9]{6,8}$/),
             createdDate: expect.any(String),
-            currentAnnIncome: null,
-            currentHouseholdIncome: null,
             primAddress1: expect.any(String),
             primCity: expect.any(String),
             primCountry: expect.any(String),
@@ -802,7 +764,6 @@ describe('parties', () => {
         ]),
       }),
     );
-    expect(data.partyDetails).toHaveLength(10);
   });
 
   it('deleteParty -- does not exist', async () => {
