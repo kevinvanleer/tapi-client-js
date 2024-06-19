@@ -4,6 +4,39 @@ jest.setTimeout(20000);
 
 describe('entities', () => {
   let createdEntityId;
+  beforeAll(async () => {
+    const { data } = await getEntities({});
+    if (data.pagination.totalRecords < 100) {
+      await Promise.all(
+        Array.from([...Array(100)], (x) => x + 1).map(() =>
+          createEntity({
+            domicile: 'U.S. citizen',
+            entityName: 'Entity Name',
+            entityType: 'revocable trust',
+            entityDesc: 'Entity Description',
+            ein: '152152',
+            primCountry: 'USA',
+            primAddress1: 'PEACHTREE PLACE',
+            primAddress2: 'PEACHTREE PLACE',
+            primCity: 'Atlanta',
+            primState: 'GA',
+            primZip: '30318',
+            emailAddress: 'johnsmith@gmail.com',
+            emailAddress2: 'johnsmith@norcapsecurities.com',
+            phone: '1234567890',
+            phone2: '2147483647',
+            totalAssets: '3',
+            ownersAI: 'no',
+            KYCstatus: 'Pending',
+            AMLstatus: 'Pending',
+            AMLdate: '02-15-2016',
+            tags: 'Tags',
+            notes: 'Notes Added',
+          }),
+        ),
+      );
+    }
+  });
   it('createEntity', async () => {
     const entity = {
       domicile: 'U.S. citizen',
@@ -218,21 +251,20 @@ describe('entities', () => {
     );
     expect(data.entityDetails).toHaveLength(2);
   });
-  it('getEntities -- get all entities', async () => {
+  it('getEntities -- get last entities', async () => {
     const limit = 50;
-    const offset = 0;
+    let offset = 0;
 
     const { data } = await getEntities({ offset, limit });
     let entities = data.entityDetails;
 
-    if (data.pagination.totalRecords <= limit) {
-      jest.fail('There is not more than one page of data');
-    }
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
 
     const responses = await Promise.all(
-      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
-        getEntities({ offset: (i + 1) * limit, limit }),
-      ),
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) => getEntities({ offset: offset + i * limit, limit })),
     );
 
     responses.forEach((r) => {
@@ -240,7 +272,7 @@ describe('entities', () => {
       entities = entities.concat(r.data.entityDetails);
     });
 
-    expect(entities).toHaveLength(data.pagination.totalRecords);
+    expect(entities).toHaveLength(data.pagination.totalRecords - offset + limit);
 
     expect(entities).toStrictEqual(
       expect.arrayContaining([
@@ -257,20 +289,21 @@ describe('entities', () => {
       ]),
     );
   });
-  it('getEntities -- get all entities w/ deleted', async () => {
+  it('getEntities -- get last entities w/ deleted', async () => {
     const limit = 50;
-    const offset = 0;
+    let offset = 0;
 
     const { data } = await getEntities({ offset, limit, deleted: true });
     let entities = data.entityDetails;
 
-    if (data.pagination.totalRecords <= limit) {
-      jest.fail('There is not more than one page of data');
-    }
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
 
     const responses = await Promise.all(
-      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
-        getEntities({ offset: (i + 1) * limit, limit, deleted: true }),
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) =>
+        getEntities({ offset: offset + i * limit, limit, deleted: true }),
       ),
     );
 
@@ -279,7 +312,7 @@ describe('entities', () => {
       entities = entities.concat(r.data.entityDetails);
     });
 
-    expect(entities).toHaveLength(data.pagination.totalRecords);
+    expect(entities).toHaveLength(data.pagination.totalRecords - offset + limit);
 
     expect(entities).toStrictEqual(
       expect.arrayContaining([
@@ -298,20 +331,21 @@ describe('entities', () => {
       ]),
     );
   });
-  it('getEntities -- POST get all entities w/ deleted', async () => {
+  it('getEntities -- POST get last entities w/ deleted', async () => {
     const limit = 50;
-    const offset = 0;
+    let offset = 0;
 
     const { data } = await getEntitiesPost({ offset, limit, deleted: true });
     let entities = data.entityDetails;
 
-    if (data.pagination.totalRecords <= limit) {
-      jest.fail('There is not more than one page of data');
-    }
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
 
     const responses = await Promise.all(
-      Array.from([...Array(Math.ceil(data.pagination.totalRecords / limit - 1))], (x) => x + 1).map((_, i) =>
-        getEntities({ offset: (i + 1) * limit, limit, deleted: true }),
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) =>
+        getEntitiesPost({ offset: offset + i * limit, limit, deleted: true }),
       ),
     );
 
