@@ -396,6 +396,7 @@ describe('parties', () => {
     });
 
     expect(parties).toHaveLength(data.pagination.totalRecords - offset + limit);
+    expect(parties.every((p) => p.emailAddress !== 'otheruser@test.com')).toBe(true);
 
     expect(parties).toStrictEqual(
       expect.arrayContaining([
@@ -472,6 +473,7 @@ describe('parties', () => {
     });
 
     expect(parties).toHaveLength(data.pagination.totalRecords - offset + limit);
+    expect(parties.every((p) => p.emailAddress !== 'otheruser@test.com')).toBe(true);
 
     expect(parties).toStrictEqual(
       expect.arrayContaining([
@@ -598,6 +600,7 @@ describe('parties', () => {
     });
 
     expect(parties).toHaveLength(data.pagination.totalRecords - offset + limit);
+    expect(parties.every((p) => p.emailAddress !== 'otheruser@test.com')).toBe(true);
 
     expect(parties).toStrictEqual(
       expect.arrayContaining([
