@@ -354,7 +354,7 @@ describe('entities', () => {
       entities = entities.concat(r.data.entityDetails);
     });
 
-    expect(entities).toHaveLength(data.pagination.totalRecords);
+    expect(entities).toHaveLength(data.pagination.totalRecords - offset + limit);
 
     expect(entities).toStrictEqual(
       expect.arrayContaining([
