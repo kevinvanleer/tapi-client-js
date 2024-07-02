@@ -120,46 +120,51 @@ describe('tapi/links', () => {
     });
   });
   it('createLink -- fakeId', async () => {
-    const { data } = await createLink('Account', accountId, 'IndivACParty', fakeId, 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'IndivACParty', fakeId, 'owner', false);
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual({
       statusCode: '1404',
       statusDesc: `Resource not found: related entry ${fakeId} of type 'IndivACParty' does not exist`,
     });
   });
   it('createLink -- bogus link type', async () => {
-    // RESPONDS 101
-    const { data } = await createLink('Account', accountId, 'IndivACParty', await getPartyId(), 'bogus_link_type', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'IndivACParty', await getPartyId(), 'bogus_link_type', false);
+    expect(response.status).toBe(422);
+    expect(response.data).toStrictEqual({
       statusDesc: "Invalid request semantics: 'bogus_link_type' is not a valid link type",
       statusCode: '1422',
     });
   });
   it('createLink -- entity not party', async () => {
-    const { data } = await createLink('Account', accountId, 'IndivACParty', entityId, 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'IndivACParty', entityId, 'owner', false);
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual({
       statusCode: '1404',
       statusDesc: `Resource not found: related entry ${entityId} of type 'IndivACParty' does not exist`,
     });
   });
   it('createLink -- party not entity', async () => {
     const partyId = await getPartyId();
-    const { data } = await createLink('Account', accountId, 'EntityACParty', partyId, 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'EntityACParty', partyId, 'owner', false);
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual({
       statusCode: '1404',
       statusDesc: `Resource not found: related entry ${partyId} of type 'EntityACParty' does not exist`,
     });
   });
   it('createLink -- party not account', async () => {
     const partyId = await getPartyId();
-    const { data } = await createLink('Account', accountId, 'Account', partyId, 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'Account', partyId, 'owner', false);
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual({
       statusCode: '1404',
       statusDesc: `Resource not found: related entry ${partyId} of type 'Account' does not exist`,
     });
   });
-  it('createLink -- success (IndivACParty)', async () => {
-    const { data } = await createLink('Account', accountId, 'IndivACParty', global.partyId, 'owner', false);
-    expect(data).toStrictEqual({
+  it('createLink -- invalid primary account<-->account', async () => {
+    const response = await createLink('Account', await getAccountId(), 'Account', await getAccountId(), 'owner', true);
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual({
       statusDesc: 'Ok',
       statusCode: '101',
       linkDetails: [
@@ -171,11 +176,62 @@ describe('tapi/links', () => {
         ],
       ],
     });
-    [, [{ id: linkId }]] = data.linkDetails;
+    [, [{ id: linkId }]] = response.data.linkDetails;
+  });
+  it('createLink -- invalid primary account <--> entity', async () => {
+    const response = await createLink('Account', await getAccountId(), 'EntityACParty', await getEntityId(), 'owner', true);
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual({
+      statusDesc: 'Ok',
+      statusCode: '101',
+      linkDetails: [
+        true,
+        [
+          {
+            id: expect.stringMatching(/^[0-9]{6,8}$/),
+          },
+        ],
+      ],
+    });
+    [, [{ id: linkId }]] = response.data.linkDetails;
+  });
+  it('createLink -- success primary party', async () => {
+    const response = await createLink('Account', accountId, 'IndivACParty', global.partyId, 'owner', true);
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual({
+      statusDesc: 'Ok',
+      statusCode: '101',
+      linkDetails: [
+        true,
+        [
+          {
+            id: expect.stringMatching(/^[0-9]{6,8}$/),
+          },
+        ],
+      ],
+    });
+    [, [{ id: linkId }]] = response.data.linkDetails;
+  });
+  it('createLink -- success (IndivACParty)', async () => {
+    const response = await createLink('Account', accountId, 'IndivACParty', await getPartyId(), 'owner', false);
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual({
+      statusDesc: 'Ok',
+      statusCode: '101',
+      linkDetails: [
+        true,
+        [
+          {
+            id: expect.stringMatching(/^[0-9]{6,8}$/),
+          },
+        ],
+      ],
+    });
   });
   it('createLink -- success (IndivAcParty)', async () => {
-    const { data } = await createLink('Account', accountId, 'IndivAcParty', await getPartyId(), 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'IndivAcParty', await getPartyId(), 'owner', false);
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual({
       statusDesc: 'Ok',
       statusCode: '101',
       linkDetails: [
@@ -189,8 +245,9 @@ describe('tapi/links', () => {
     });
   });
   it('createLink -- success (indivacparty)', async () => {
-    const { data } = await createLink('Account', accountId, 'indivacparty', await getPartyId(), 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'indivacparty', await getPartyId(), 'owner', false);
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual({
       statusDesc: 'Ok',
       statusCode: '101',
       linkDetails: [
@@ -204,8 +261,9 @@ describe('tapi/links', () => {
     });
   });
   it('createLink -- success (INDIVACPARTY/OWNER)', async () => {
-    const { data } = await createLink('Account', accountId, 'INDIVACPARTY', await getPartyId(), 'OWNER', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'INDIVACPARTY', await getPartyId(), 'OWNER', false);
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual({
       statusDesc: 'Ok',
       statusCode: '101',
       linkDetails: [
@@ -219,8 +277,9 @@ describe('tapi/links', () => {
     });
   });
   it('createLink -- success (EntityAcParty)', async () => {
-    const { data } = await createLink('Account', accountId, 'EntityAcParty', await getEntityId(), 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'EntityAcParty', await getEntityId(), 'owner', false);
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual({
       statusDesc: 'Ok',
       statusCode: '101',
       linkDetails: [
@@ -234,8 +293,9 @@ describe('tapi/links', () => {
     });
   });
   it('createLink -- success (Account to Account)', async () => {
-    const { data } = await createLink('Account', accountId, 'Account', await getAccountId(), 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('Account', accountId, 'Account', await getAccountId(), 'owner', false);
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual({
       statusDesc: 'Ok',
       statusCode: '101',
       linkDetails: [
@@ -249,8 +309,9 @@ describe('tapi/links', () => {
     });
   });
   it('createLink -- cannot self link', async () => {
-    const { data } = await createLink('account', accountId, 'account', accountId, 'owner', false);
-    expect(data).toStrictEqual(
+    const response = await createLink('account', accountId, 'account', accountId, 'owner', false);
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1400',
         statusDesc: 'Bad request: cannot link resource to itself',
@@ -258,8 +319,9 @@ describe('tapi/links', () => {
     );
   });
   it('createLink -- success (account to account)', async () => {
-    const { data } = await createLink('account', accountId, 'account', await getAccountId(), 'owner', false);
-    expect(data).toStrictEqual({
+    const response = await createLink('account', accountId, 'account', await getAccountId(), 'owner', false);
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual({
       statusDesc: 'Ok',
       statusCode: '101',
       linkDetails: [
@@ -273,8 +335,9 @@ describe('tapi/links', () => {
     });
   });
   it('createLink -- link exists', async () => {
-    const { data } = await createLink('Account', accountId, 'IndivACParty', global.partyId, 'owner', false);
-    expect(data).toStrictEqual(
+    const response = await createLink('Account', accountId, 'IndivACParty', global.partyId, 'owner', false);
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1400',
         statusDesc: 'Bad request: link already exists',
@@ -282,8 +345,9 @@ describe('tapi/links', () => {
     );
   });
   it('createAccountLink -- link exists', async () => {
-    const { data } = await createAccountLink(accountId, 'IndivACParty', global.partyId, 'owner');
-    expect(data).toStrictEqual(
+    const response = await createAccountLink(accountId, 'IndivACParty', global.partyId, 'owner');
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1400',
         statusDesc: 'Bad request: link already exists',
@@ -291,8 +355,8 @@ describe('tapi/links', () => {
     );
   });
   it('createAccountLink -- no link type', async () => {
-    const { data } = await createAccountLink(accountId, 'bogus_type', uuid.v4());
-    expect(data).toStrictEqual(
+    const response = await createAccountLink(accountId, 'bogus_type', uuid.v4());
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1400',
         statusDesc: `Bad request: missing parameter 'linkType'`,
@@ -301,8 +365,9 @@ describe('tapi/links', () => {
   });
   it('createAccountLink -- bogus party ID', async () => {
     const bogusId = uuid.v4();
-    const { data } = await createAccountLink(accountId, 'IndivACParty', bogusId, 'owner');
-    expect(data).toStrictEqual(
+    const response = await createAccountLink(accountId, 'IndivACParty', bogusId, 'owner');
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1404',
         statusDesc: `Resource not found: related entry ${bogusId} of type 'IndivACParty' does not exist`,
@@ -310,41 +375,36 @@ describe('tapi/links', () => {
     );
   });
   it('createAccountLink -- success', async () => {
-    const { data } = await createAccountLink(accountId, 'IndivACParty', await getPartyId(), 'owner');
-    expect(data).toStrictEqual(
+    const response = await createAccountLink(accountId, 'IndivACParty', await getPartyId(), 'owner');
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',
       }),
     );
   });
   it('linkAccountOwner -- no such party', async () => {
-    const { data } = await linkAccountOwner(accountId, fakeId);
-    expect(data).toStrictEqual(
+    const response = await linkAccountOwner(accountId, fakeId);
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1404',
         statusDesc: `Resource not found: related entry ${fakeId} of type 'IndivACParty' does not exist`,
       }),
     );
   });
-  it('linkAccountOwner -- account has primary party', async () => {
-    const { data } = await linkAccountOwner(accountId, await getPartyId());
-    expect(data).toStrictEqual(
-      expect.objectContaining({
-        statusCode: '101',
-      }),
-    );
-  });
   it('linkAccountOwner -- success', async () => {
-    const { data } = await linkAccountOwner(await getAccountId(), await getPartyId());
-    expect(data).toStrictEqual(
+    const response = await linkAccountOwner(await getAccountId(), await getPartyId());
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',
       }),
     );
   });
   it('linkAccountOwner -- link exists', async () => {
-    const { data } = await linkAccountOwner(accountId, global.partyId);
-    expect(data).toStrictEqual(
+    const response = await linkAccountOwner(accountId, global.partyId);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1400',
         statusDesc: 'Bad request: link already exists',
@@ -352,8 +412,9 @@ describe('tapi/links', () => {
     );
   });
   it('linkAccountIndividual -- no such party', async () => {
-    const { data } = await linkAccountIndividual(accountId, fakeId);
-    expect(data).toStrictEqual(
+    const response = await linkAccountIndividual(accountId, fakeId);
+    expect(response.status).toBe(404);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1404',
         statusDesc: `Resource not found: related entry ${fakeId} of type 'IndivACParty' does not exist`,
@@ -361,8 +422,9 @@ describe('tapi/links', () => {
     );
   });
   it('linkAccountIndividual -- link exists', async () => {
-    const { data } = await linkAccountIndividual(accountId, global.partyId);
-    expect(data).toStrictEqual(
+    const response = await linkAccountIndividual(accountId, global.partyId);
+    expect(response.status).toBe(400);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '1400',
         statusDesc: 'Bad request: link already exists',
@@ -370,8 +432,9 @@ describe('tapi/links', () => {
     );
   });
   it('linkAccountIndividual -- success', async () => {
-    const { data } = await linkAccountIndividual(accountId, await getPartyId());
-    expect(data).toStrictEqual(
+    const response = await linkAccountIndividual(accountId, await getPartyId());
+    expect(response.status).toBe(200);
+    expect(response.data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',
       }),
