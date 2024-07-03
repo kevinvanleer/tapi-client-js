@@ -163,37 +163,19 @@ describe('tapi/links', () => {
   });
   it('createLink -- invalid primary account<-->account', async () => {
     const response = await createLink('Account', await getAccountId(), 'Account', await getAccountId(), 'owner', true);
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(422);
     expect(response.data).toStrictEqual({
-      statusDesc: 'Ok',
-      statusCode: '101',
-      linkDetails: [
-        true,
-        [
-          {
-            id: expect.stringMatching(/^[0-9]{6,8}$/),
-          },
-        ],
-      ],
+      statusCode: '1422',
+      statusDesc: "Invalid request semantics: related entry type must be 'IndivACParty'",
     });
-    [, [{ id: linkId }]] = response.data.linkDetails;
   });
   it('createLink -- invalid primary account <--> entity', async () => {
     const response = await createLink('Account', await getAccountId(), 'EntityACParty', await getEntityId(), 'owner', true);
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(422);
     expect(response.data).toStrictEqual({
-      statusDesc: 'Ok',
-      statusCode: '101',
-      linkDetails: [
-        true,
-        [
-          {
-            id: expect.stringMatching(/^[0-9]{6,8}$/),
-          },
-        ],
-      ],
+      statusCode: '1422',
+      statusDesc: "Invalid request semantics: related entry type must be 'IndivACParty'",
     });
-    [, [{ id: linkId }]] = response.data.linkDetails;
   });
   it('createLink -- success primary party', async () => {
     const response = await createLink('Account', accountId, 'IndivACParty', global.partyId, 'owner', true);
@@ -211,6 +193,14 @@ describe('tapi/links', () => {
       ],
     });
     [, [{ id: linkId }]] = response.data.linkDetails;
+  });
+  it('createLink -- only one primary party', async () => {
+    const response = await createLink('Account', accountId, 'IndivACParty', await getPartyId(), 'owner', true);
+    expect(response.status).toBe(422);
+    expect(response.data).toStrictEqual({
+      statusCode: '1422',
+      statusDesc: `Invalid request semantics: ${accountId} already has primary party`,
+    });
   });
   it('createLink -- success (IndivACParty)', async () => {
     const response = await createLink('Account', accountId, 'IndivACParty', await getPartyId(), 'owner', false);
