@@ -14,6 +14,8 @@ const cancelTrade = (tradeId, details) => post('/cancelInvestment', { tradeId, .
 
 const getPaymentInfo = (tradeId) => post('/getPaymentInfo', { tradeId });
 
+const updateTradeStatus = (tradeId, accountId, orderStatus) => post('/updateTradeStatus', { tradeId, accountId, orderStatus });
+
 const getTradeStatus = (tradeId) => post('/getTradeStatus', { tradeId });
 
 module.exports = {
@@ -24,5 +26,6 @@ module.exports = {
   deleteTrade,
   cancelTrade,
   getPaymentInfo,
+  updateTradeStatus,
   getTradeStatus,
 };

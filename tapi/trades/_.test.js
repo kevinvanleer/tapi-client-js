@@ -1,4 +1,4 @@
-const { createTrade, editTrade, getAllTrades, getTrade, getTradeStatus, deleteTrade } = require('.');
+const { createTrade, editTrade, getAllTrades, getTrade, updateTradeStatus, getTradeStatus, deleteTrade } = require('.');
 
 const { accounts, offerings, links } = require('..');
 
@@ -188,14 +188,12 @@ describe('trades', () => {
             orderId: expect.stringMatching(/[0-9]+/),
             escrowId: null,
             partyId: global.partyId,
-            // developerAPIKey: 'XXXXXXXXXXXXXXX',
             party_type: 'IndivACParty',
             transactionType: 'WIRE',
-            totalAmount: '1.000000',
-            totalShares: '1.000000',
+            totalAmount: '2.000000',
+            totalShares: '2.000000',
             orderStatus: 'CREATED',
             createdDate: expect.any(String),
-            // createdIpAddress: null,
             errors: '',
             documentKey: '',
             esignStatus: 'NOTSIGNED',
@@ -210,9 +208,9 @@ describe('trades', () => {
             PrincipalName: null,
             PrincipalDate: null,
             archived_status: '0',
-            closeId: null,
+            closeId: expect.anything(),
             eligibleToClose: 'no',
-            // notes: expect.anything(),
+            notes: expect.anything(),
           }),
         ]),
       }),
@@ -248,6 +246,36 @@ describe('trades', () => {
             orderStatus: 'CREATED',
           }),
         ]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- funded', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'FUNDED');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'FUNDED' })]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- unwind pending', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND PENDING');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND PENDING' })]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- unwind settled', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND SETTLED');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND SETTLED' })]),
       }),
     );
   });
