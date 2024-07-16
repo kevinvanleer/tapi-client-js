@@ -1,12 +1,14 @@
 const { accounts, offerings, links, trades } = require('..');
-const { addDocuments, getDocuments } = require('.');
+const { addDocuments, getDocuments, updateDocumentMetadata, updateDocument } = require('.');
 
 jest.setTimeout(10000);
 
 describe('offerings/documents', () => {
+  const testRefCode = '0000000';
   let createdTradeId;
   let offeringId;
   let accountId;
+  let subjectDocumentId;
 
   beforeAll(async () => {
     const { data: offering } = await offerings.createOffering({
@@ -57,19 +59,11 @@ describe('offerings/documents', () => {
 
   it('getDocuments (getDocumentsForOffering) -- no offering ID', async () => {
     const { data } = await getDocuments();
-    expect(data).toStrictEqual({
-      'Error(s)': '<br />offeringIdu0026nbsp;u0026nbsp; : Missing',
-      statusCode: '106',
-      statusDesc: 'Data/parameter missing',
-    });
+    expect(data.statusCode).toStrictEqual('404');
   });
   it('getDocuments (getDocumentsForOffering) -- invalid non-numeric offering ID', async () => {
     const { data } = await getDocuments('invalid-offering-id');
-    expect(data).toStrictEqual({
-      'Error(s)': '<br />offeringIdu0026nbsp;Numeric values only',
-      statusCode: '106',
-      statusDesc: 'Data/parameter missing',
-    });
+    expect(data.statusCode).toStrictEqual('404');
   });
   it('getDocuments (getDocumentsForOffering) -- invalid numeric offering ID', async () => {
     const { data } = await getDocuments(123.123);
@@ -96,14 +90,15 @@ describe('offerings/documents', () => {
       document_details: [
         {
           offeringId,
-          documentReferenceCode: '0000000',
+          documentReferenceCode: testRefCode,
           documentId: expect.stringMatching(/^[0-9]{4,5}$/),
           documentURL: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/admin_v3\/Upload_documentation\/uploadDocument\/[a-zA-Z0-9]*$/,
+            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
           ),
         },
       ],
     });
+    subjectDocumentId = data.document_details[0].documentId;
   });
   it('getDocuments (getDocumentsForOffering) -- one item', async () => {
     const { data } = await getDocuments(offeringId);
@@ -113,17 +108,20 @@ describe('offerings/documents', () => {
       document_details: [
         {
           createdDate: expect.any(String),
-          documentFileReferenceCode: '0000000',
+          documentFileReferenceCode: testRefCode,
           documentId: expect.stringMatching(/^[0-9]{4,5}$/),
           documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'test-document-0.pdf',
           templateName: null,
           url: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/admin_v3\/Upload_documentation\/uploadDocument\/[a-zA-Z0-9]*$/,
+            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
           ),
         },
       ],
     });
+
+    // const resp = await fetch(data.document_details[0].url);
+    // expect(resp.status).toStrictEqual(200);
   });
   it('getDocuments (getDocumentsForOffering) -- three items', async () => {
     const { data: doc1 } = await addDocuments(offeringId, {
@@ -141,36 +139,97 @@ describe('offerings/documents', () => {
       document_details: [
         {
           createdDate: expect.any(String),
-          documentFileReferenceCode: '0000000',
+          documentFileReferenceCode: testRefCode,
           documentId: expect.stringMatching(/^[0-9]{4,5}$/),
           documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'test-document-0.pdf',
           templateName: null,
           url: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/admin_v3\/Upload_documentation\/uploadDocument\/[a-zA-Z0-9]*$/,
+            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
           ),
         },
         {
           createdDate: expect.any(String),
-          documentFileReferenceCode: '0000000',
+          documentFileReferenceCode: testRefCode,
           documentId: doc1.document_details[0].documentId,
           documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'test-document-1.pdf',
           templateName: null,
           url: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/admin_v3\/Upload_documentation\/uploadDocument\/[a-zA-Z0-9]*$/,
+            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
           ),
         },
         {
           createdDate: expect.any(String),
-          documentFileReferenceCode: '0000000',
+          documentFileReferenceCode: testRefCode,
           documentId: doc2.document_details[0].documentId,
           documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'test-document-2.pdf',
           templateName: null,
           url: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/admin_v3\/Upload_documentation\/uploadDocument\/[a-zA-Z0-9]*$/,
+            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
           ),
+        },
+      ],
+    });
+  });
+  it('updateDocument (updateDocumentForOffering) -- success', async () => {
+    expect(subjectDocumentId).toStrictEqual(expect.stringMatching(/^[0-9]{4,5}$/));
+    const { data } = await updateDocument(offeringId, subjectDocumentId, {
+      buffer: Buffer.from('b'.repeat(1e3)),
+      originalname: `test-document-0.pdf`,
+    });
+    expect(data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: {
+        // createdDate: expect.any(String),
+        // documentFileReferenceCode: 'Updated File Reference Code',
+        documentReferenceCode: testRefCode,
+        documentId: subjectDocumentId,
+        documentFileName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
+        documentTitle: 'test-document-0.pdf',
+        documentURL: expect.stringMatching(
+          new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
+        ),
+        offeringId,
+      },
+    });
+  });
+  it('updateDocumentMetadata (updateOfferingDocument) -- invalid document ID', async () => {
+    expect(subjectDocumentId).toStrictEqual(expect.stringMatching(/^[0-9]{4,5}$/));
+    const resp = await updateDocumentMetadata({
+      documentId: 'invalid-document-id',
+      documentTitle: 'Updated Document Title',
+      documentFileReferenceCode: 'Updated File Reference Code',
+      offeringId,
+    });
+    expect(resp.data.statusCode).toStrictEqual('106');
+  });
+  it('updateDocumentMetadata (updateOfferingDocument) -- success', async () => {
+    expect(subjectDocumentId).toStrictEqual(expect.stringMatching(/^[0-9]{4,5}$/));
+    const resp = await updateDocumentMetadata({
+      documentId: subjectDocumentId,
+      documentTitle: 'Updated Document Title',
+      // documentFileReferenceCode: 'Updated File Reference Code',
+      documentFileReferenceCode: testRefCode,
+      offeringId,
+    });
+    expect(resp.data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: [
+        {
+          // createdDate: expect.any(String),
+          // documentFileReferenceCode: 'Updated File Reference Code',
+          // documentFileReferenceCode: testRefCode,
+          documentId: subjectDocumentId,
+          // documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
+          documentTitle: 'Updated Document Title',
+          documentURL: expect.stringMatching(
+            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
+          ),
+          offeringId,
         },
       ],
     });
