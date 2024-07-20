@@ -269,6 +269,16 @@ describe('trades', () => {
       }),
     );
   });
+  it('updateTradeStatus -- unwind_pending', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND_PENDING');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND_PENDING' })]),
+      }),
+    );
+  });
   it('updateTradeStatus -- unwind settled', async () => {
     const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND SETTLED');
     expect(data).toStrictEqual(
@@ -276,6 +286,16 @@ describe('trades', () => {
         statusCode: '101',
         statusDesc: 'Ok',
         tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND SETTLED' })]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- unwind_settled', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND_SETTLED');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND_SETTLED' })]),
       }),
     );
   });
