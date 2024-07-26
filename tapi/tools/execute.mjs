@@ -5,11 +5,20 @@ curlirize(tapi);
 
 let payload = {};
 let command;
+let method;
+
+const methods = ['get', 'post', 'put', 'patch', 'delete'];
 
 process.argv.forEach((val, index, array) => {
   if (val.endsWith('execute.mjs')) {
-    command = array[index + 1];
-    payload = JSON.parse(array[index + 2]);
+    if (methods.includes(array[index + 1])) {
+      method = array[index + 1];
+      command = array[index + 2];
+      payload = JSON.parse(array[index + 3]);
+    } else {
+      command = array[index + 1];
+      payload = JSON.parse(array[index + 2]);
+    }
   }
 });
 
@@ -19,7 +28,7 @@ if (command == null) {
 }
 
 try {
-  const response = await execute(command, payload);
+  const response = await execute(command, payload, method);
   console.log(JSON.stringify(response.data, null, 2));
   if (response.status >= 400) {
     console.log('');

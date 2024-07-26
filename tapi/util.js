@@ -49,7 +49,23 @@ if (process.env.TAPI_API_KEY == null) console.warn('WARNING: TAPI API key is not
 const get = (command, payload, config) => tapi.get(command, { params: { ...payload }, ...config });
 const put = (command, payload, config) => tapi.put(command, { ...auth, ...payload }, config);
 const post = (command, payload, config) => tapi.post(command, { ...auth, ...payload }, config);
-const execute = (command, payload) => (command.startsWith('create') ? put(command, payload) : post(command, payload));
+const execute = (command, payload, method) => {
+  if (!method) {
+    return command.startsWith('create') ? put(command, payload) : post(command, payload);
+  }
+  switch (method) {
+    case 'get':
+      return get(command, payload);
+    case 'post':
+      return post(command, payload);
+    case 'put':
+      return put(command, payload);
+    case 'patch':
+    case 'delete':
+    default:
+      throw Error('Unknown method');
+  }
+};
 
 const getFormattedDate = (date) =>
   `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
