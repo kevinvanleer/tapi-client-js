@@ -254,6 +254,7 @@ describe('parties', () => {
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '239',
+        statusDesc: 'Request parameter out of accepted range: limit 10000 is not between 1 and 500',
         partyDetails: [],
       }),
     );
