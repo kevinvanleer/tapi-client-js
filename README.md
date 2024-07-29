@@ -4,10 +4,10 @@ NodeJS Javascript Transact API client.
 
 # prerequisites
 
-NodeJS
-tapi-db-seeder
-Transact API local development environment
-Transact API credentials
+- NodeJS
+- tapi-db-seeder
+- Transact API local development environment
+- Transact API credentials
 
 # installation
 
