@@ -14,7 +14,7 @@ process.argv.forEach((val, index, array) => {
     if (methods.includes(array[index + 1])) {
       method = array[index + 1];
       command = array[index + 2];
-      payload = JSON.parse(array[index + 3]);
+      payload = method !== 'get' ? JSON.parse(array[index + 3]) : {};
     } else {
       command = array[index + 1];
       payload = JSON.parse(array[index + 2]);
