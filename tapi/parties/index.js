@@ -1,11 +1,10 @@
 const FormData = require('form-data');
 const { Readable } = require('stream');
-const { userToParty } = require('./util');
 const { tapi, auth, put, post, get, serverlessHost } = require('../util');
 
-const createParty = (user) => put('/createParty', userToParty(user));
+const createParty = (party) => put('/createParty', party);
 
-const updateParty = (user) => post('/updateParty', userToParty(user));
+const updateParty = (party) => post('/updateParty', party);
 
 const getAllParties = (offset, limit, deleted) => post('/getAllParties', { offset, limit, deleted });
 const getPartiesGet = ({ offset, limit, deleted, type }) => get('/parties', { offset, limit, deleted, type });

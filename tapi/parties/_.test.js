@@ -30,12 +30,12 @@ describe('parties', () => {
   beforeAll(async () => {
     const { data } = await getParties({});
     if (data.pagination.totalRecords < 100) {
-      await Promise.all(Array.from([...Array(100)], (x) => x + 1).map(() => createParty(validUser)));
+      await Promise.all(Array.from([...Array(100)], (x) => x + 1).map(() => createParty(userToParty(validUser))));
     }
   });
   it('createParty', async () => {
     expect(hasRequiredPartyFields(validUser)).toBe(true);
-    const { data } = await createParty(validUser);
+    const { data } = await createParty(userToParty(validUser));
     expect(data.statusDesc).toEqual('Ok');
     expect(data.statusCode).toEqual('101');
     const [, [partyDetails]] = data.partyDetails;
@@ -61,8 +61,144 @@ describe('parties', () => {
       usa_citizenship_status: 'citizen',
     };
     expect(hasRequiredPartyFields(user)).toBe(false);
-    const { data } = await createParty(user);
+    const { data } = await createParty(userToParty(user));
     expect(data.statusCode).toEqual('106');
+  });
+  it('createParty -- invalid state code', async () => {
+    const party = userToParty({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    party.primState = 'ZZ';
+    const { data } = await createParty(party);
+    expect(data.statusCode).toEqual('1422');
+  });
+  it('createParty -- invalid state name', async () => {
+    const party = userToParty({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    party.primState = 'Invalid';
+    const { data } = await createParty(party);
+    expect(data.statusCode).toEqual('1422');
+  });
+  it('createParty -- valid state name', async () => {
+    const party = userToParty({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    party.primState = 'Alabama';
+    const { data } = await createParty(party);
+    expect(data.statusCode).toEqual('101');
+  });
+  it('createParty -- valid armed forces', async () => {
+    const party = userToParty({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    party.primState = 'AA';
+    const { data } = await createParty(party);
+    expect(data.statusCode).toEqual('101');
+  });
+  it('createParty -- invalid non-US', async () => {
+    const party = userToParty({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    party.primState = 'non-US';
+    const { data } = await createParty(party);
+    expect(data.statusCode).toEqual('1422');
+  });
+  it('createParty -- invalid Non-U.S', async () => {
+    const party = userToParty({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    party.primState = 'Non-U.S';
+    const { data } = await createParty(party);
+    expect(data.statusCode).toEqual('1422');
+  });
+  it('createParty -- invalid non-us', async () => {
+    const party = userToParty({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    party.primState = 'non-us';
+    const { data } = await createParty(party);
+    expect(data.statusCode).toEqual('1422');
+  });
+  it('createParty -- NOUS', async () => {
+    const party = userToParty({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    party.primState = 'NOUS';
+    const { data } = await createParty(party);
+    expect(data.statusCode).toEqual('101');
   });
   it('getParty -- invalid ID', async () => {
     const { data } = await getParty('invalid-party-id');
@@ -98,7 +234,7 @@ describe('parties', () => {
       partyId: createdPartyId,
       city: 'Best City',
     };
-    const { data } = await updateParty(user);
+    const { data } = await updateParty(userToParty(user));
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusDesc: 'Ok',
