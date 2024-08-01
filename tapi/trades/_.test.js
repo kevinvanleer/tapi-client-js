@@ -1,9 +1,26 @@
-const { createTrade, editTrade, getAllTrades, getTrade, getTradeStatus, deleteTrade } = require('.');
+const {
+  createTrade,
+  editTrade,
+  getAllTrades,
+  getTrade,
+  updateTradeStatus,
+  getTradeStatus,
+  deleteTrade,
+  uploadTradeDocument,
+  getTradeDocument,
+} = require('.');
 
 const { accounts, offerings, links } = require('..');
 
 let offeringId;
 let accountId;
+const trade = {
+  transactionType: 'WIRE',
+  transactionUnits: '1',
+};
+let validTrade = {
+  ...trade,
+};
 
 jest.setTimeout(30000);
 
@@ -40,6 +57,7 @@ beforeAll(async () => {
   if (account.statusCode !== '101') throw account;
   accountId = account.accountDetails[0].accountId;
   await links.linkAccountOwner(accountId, global.partyId);
+  validTrade = { ...trade, accountId, offeringId };
 });
 
 afterAll(async () => {
@@ -48,11 +66,7 @@ afterAll(async () => {
 });
 
 describe('trades', () => {
-  const trade = {
-    transactionType: 'WIRE',
-    transactionUnits: '1',
-  };
-
+  const host = process.env.TAPI_HOST.replace('http://', 'https://');
   let createdTradeId;
 
   it('createTrade -- invalid', async () => {
@@ -65,12 +79,6 @@ describe('trades', () => {
     );
   });
   it('createTrade -- valid', async () => {
-    const validTrade = {
-      ...trade,
-      offeringId,
-      accountId,
-    };
-
     const { data } = await createTrade(validTrade);
     expect(data).toStrictEqual(
       expect.objectContaining({
@@ -188,14 +196,12 @@ describe('trades', () => {
             orderId: expect.stringMatching(/[0-9]+/),
             escrowId: null,
             partyId: global.partyId,
-            // developerAPIKey: 'XXXXXXXXXXXXXXX',
             party_type: 'IndivACParty',
             transactionType: 'WIRE',
-            totalAmount: '1.000000',
-            totalShares: '1.000000',
+            totalAmount: '2.000000',
+            totalShares: '2.000000',
             orderStatus: 'CREATED',
             createdDate: expect.any(String),
-            // createdIpAddress: null,
             errors: '',
             documentKey: '',
             esignStatus: 'NOTSIGNED',
@@ -210,9 +216,9 @@ describe('trades', () => {
             PrincipalName: null,
             PrincipalDate: null,
             archived_status: '0',
-            closeId: null,
+            closeId: expect.anything(),
             eligibleToClose: 'no',
-            // notes: expect.anything(),
+            notes: expect.anything(),
           }),
         ]),
       }),
@@ -248,6 +254,56 @@ describe('trades', () => {
             orderStatus: 'CREATED',
           }),
         ]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- funded', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'FUNDED');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'FUNDED' })]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- unwind pending', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND PENDING');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND PENDING' })]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- unwind_pending', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND_PENDING');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND_PENDING' })]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- unwind settled', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND SETTLED');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND SETTLED' })]),
+      }),
+    );
+  });
+  it('updateTradeStatus -- unwind_settled', async () => {
+    const { data } = await updateTradeStatus(createdTradeId, accountId, 'UNWIND_SETTLED');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        tradeDetails: expect.arrayContaining([expect.objectContaining({ orderStatus: 'UNWIND_SETTLED' })]),
       }),
     );
   });
@@ -290,30 +346,77 @@ describe('trades', () => {
       statusDesc: 'Data/parameter missing',
     });
   });
-  it('deleteTrade -- success', async () => {
+  it('deleteTrade -- wrong status', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
     const { data } = await deleteTrade(createdTradeId, accountId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '190',
+        statusDesc: 'Trade status should be in CREATED',
+      }),
+    );
+  });
+  let deleteTradeId;
+  it('deleteTrade -- success', async () => {
+    const { tradeId } = (await createTrade(validTrade)).data.purchaseDetails[1][0];
+    expect(tradeId).toMatch(/[0-9]+/);
+    const { data } = await deleteTrade(tradeId, accountId);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',
         statusDesc: 'Ok',
       }),
     );
+    deleteTradeId = tradeId;
   });
   it('getTrade -- canceled', async () => {
-    expect(createdTradeId).toMatch(/[0-9]+/);
-    const { data } = await getTrade(createdTradeId, accountId);
+    expect(deleteTradeId).toMatch(/[0-9]+/);
+    const { data } = await getTrade(deleteTradeId, accountId);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',
         statusDesc: 'Ok',
         partyDetails: expect.arrayContaining([
           expect.objectContaining({
-            orderId: createdTradeId,
+            orderId: deleteTradeId,
             orderStatus: 'CANCELED',
           }),
         ]),
       }),
     );
+  });
+  it('uploadTradeDocument', async () => {
+    const { data } = await uploadTradeDocument(createdTradeId, {
+      buffer: Buffer.from('a'.repeat(1e3)),
+      originalname: `test-document-0.pdf`,
+    });
+    expect(data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: 'Document has been uploaded Successfully',
+    });
+  });
+  it('getTradeDocument', async () => {
+    const { data } = await getTradeDocument(createdTradeId);
+    expect(data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: [
+        {
+          archive_status: '0',
+          virtualStatus: 'ACTIVE',
+          createdDate: expect.any(String),
+          tradeId: createdTradeId,
+          documentFileReferenceCode: expect.stringMatching(/^[\d]+$/),
+          id: expect.stringMatching(/^[\d]+$/),
+          documentid: expect.stringMatching(/^[\w]{4,5}$/),
+          documentFileName: expect.stringMatching(/^[\w]+\.pdf$/),
+          documentTitle: 'test-document-0.pdf',
+          documentUrl: expect.stringMatching(
+            new RegExp(`^${host}/admin_v3/Upload_documentation/uploadAdminDocument/[a-zA-Z0-9=]*$`),
+          ),
+        },
+      ],
+    });
   });
 });

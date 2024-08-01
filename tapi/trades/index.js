@@ -1,4 +1,7 @@
-const { post, put } = require('../util');
+const FormData = require('form-data');
+const { Readable } = require('stream');
+
+const { tapi, auth, post, put } = require('../util');
 
 const getTrade = (tradeId, accountId) => post('/getTrade', { tradeId, accountId });
 
@@ -14,7 +17,26 @@ const cancelTrade = (tradeId, details) => post('/cancelInvestment', { tradeId, .
 
 const getPaymentInfo = (tradeId) => post('/getPaymentInfo', { tradeId });
 
+const updateTradeStatus = (tradeId, accountId, orderStatus) => post('/updateTradeStatus', { tradeId, accountId, orderStatus });
+
 const getTradeStatus = (tradeId) => post('/getTradeStatus', { tradeId });
+
+const getTradeDocument = (tradeId) => post('/getTradeDocument', { tradeId });
+
+const uploadTradeDocument = (tradeId, file) => {
+  const data = new FormData();
+  data.append('clientID', auth.clientID);
+  data.append('developerAPIKey', auth.developerAPIKey);
+  data.append('tradeId', tradeId);
+  data.append('documentTitle', `documentTitle0="${file.originalname}"`);
+  data.append('file_name', `filename0="${file.originalname}"`);
+  data.append('userfile0', Readable.from(file.buffer), { filename: file.originalname });
+
+  return tapi.post('/uploadTradeDocument', data, {
+    timeout: 60000,
+    headers: { ...data.getHeaders() },
+  });
+};
 
 module.exports = {
   getTrade,
@@ -24,5 +46,8 @@ module.exports = {
   deleteTrade,
   cancelTrade,
   getPaymentInfo,
+  updateTradeStatus,
   getTradeStatus,
+  uploadTradeDocument,
+  getTradeDocument,
 };

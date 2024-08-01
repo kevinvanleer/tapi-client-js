@@ -9,6 +9,7 @@ describe('offerings/documents', () => {
   let offeringId;
   let accountId;
   let subjectDocumentId;
+  const host = process.env.TAPI_HOST.replace('http://', 'https://');
 
   beforeAll(async () => {
     const { data: offering } = await offerings.createOffering({
@@ -59,11 +60,21 @@ describe('offerings/documents', () => {
 
   it('getDocuments (getDocumentsForOffering) -- no offering ID', async () => {
     const { data } = await getDocuments();
-    expect(data.statusCode).toStrictEqual('404');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+        statusDesc: 'Data/parameter missing',
+      }),
+    );
   });
   it('getDocuments (getDocumentsForOffering) -- invalid non-numeric offering ID', async () => {
     const { data } = await getDocuments('invalid-offering-id');
-    expect(data.statusCode).toStrictEqual('404');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '106',
+        statusDesc: 'Data/parameter missing',
+      }),
+    );
   });
   it('getDocuments (getDocumentsForOffering) -- invalid numeric offering ID', async () => {
     const { data } = await getDocuments(123.123);
@@ -92,9 +103,7 @@ describe('offerings/documents', () => {
           offeringId,
           documentReferenceCode: testRefCode,
           documentId: expect.stringMatching(/^[0-9]{4,5}$/),
-          documentURL: expect.stringMatching(
-            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
-          ),
+          documentURL: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
       ],
     });
@@ -113,9 +122,7 @@ describe('offerings/documents', () => {
           documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'test-document-0.pdf',
           templateName: null,
-          url: expect.stringMatching(
-            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
-          ),
+          url: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
       ],
     });
@@ -144,9 +151,7 @@ describe('offerings/documents', () => {
           documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'test-document-0.pdf',
           templateName: null,
-          url: expect.stringMatching(
-            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
-          ),
+          url: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
         {
           createdDate: expect.any(String),
@@ -155,9 +160,7 @@ describe('offerings/documents', () => {
           documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'test-document-1.pdf',
           templateName: null,
-          url: expect.stringMatching(
-            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
-          ),
+          url: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
         {
           createdDate: expect.any(String),
@@ -166,9 +169,7 @@ describe('offerings/documents', () => {
           documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'test-document-2.pdf',
           templateName: null,
-          url: expect.stringMatching(
-            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
-          ),
+          url: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
       ],
     });
@@ -189,9 +190,7 @@ describe('offerings/documents', () => {
         documentId: subjectDocumentId,
         documentFileName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
         documentTitle: 'test-document-0.pdf',
-        documentURL: expect.stringMatching(
-          new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
-        ),
+        documentURL: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         offeringId,
       },
     });
@@ -226,9 +225,7 @@ describe('offerings/documents', () => {
           documentId: subjectDocumentId,
           // documentName: expect.stringMatching(/^[a-zA-Z0-9]*.pdf$/),
           documentTitle: 'Updated Document Title',
-          documentURL: expect.stringMatching(
-            new RegExp(`^${process.env.TAPI_HOST}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
-          ),
+          documentURL: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
           offeringId,
         },
       ],

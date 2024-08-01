@@ -78,6 +78,16 @@ describe('offerings', () => {
       }),
     );
   });
+  it('getOffering -- invalid offering ID', async () => {
+    expect(createdOfferingId).toMatch(/[0-9]+/);
+    const { data } = await getOffering('invalid-offering-id');
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '162',
+        statusDesc: 'offeringId/clientID does not match',
+      }),
+    );
+  });
   it('getOffering -- success', async () => {
     expect(createdOfferingId).toMatch(/[0-9]+/);
     const { data } = await getOffering(createdOfferingId);
