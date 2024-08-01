@@ -1,9 +1,8 @@
-const { auth, stateNameToAbbr } = require('../util');
+const { stateNameToAbbr } = require('../util');
 
 const makeIndividualAccount = (user) =>
   Object.fromEntries(
     Object.entries({
-      ...auth,
       type: 'individual',
       accountId: user.accountId,
       accountRegistration: `${user.first_name} ${user.last_name}`,
