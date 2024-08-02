@@ -79,7 +79,7 @@ describe('parties', () => {
     });
     party.primState = 'ZZ';
     const { data } = await createParty(party);
-    expect(data.statusCode).toEqual('1422');
+    expect(data.statusCode).toEqual('101');
   });
   it('createParty -- invalid state name', async () => {
     const party = userToParty({
@@ -96,7 +96,7 @@ describe('parties', () => {
     });
     party.primState = 'Invalid';
     const { data } = await createParty(party);
-    expect(data.statusCode).toEqual('1422');
+    expect(data.statusCode).toEqual('101');
   });
   it('createParty -- valid state name', async () => {
     const party = userToParty({
@@ -147,7 +147,7 @@ describe('parties', () => {
     });
     party.primState = 'non-US';
     const { data } = await createParty(party);
-    expect(data.statusCode).toEqual('1422');
+    expect(data.statusCode).toEqual('101');
   });
   it('createParty -- invalid Non-U.S', async () => {
     const party = userToParty({
@@ -164,7 +164,7 @@ describe('parties', () => {
     });
     party.primState = 'Non-U.S';
     const { data } = await createParty(party);
-    expect(data.statusCode).toEqual('1422');
+    expect(data.statusCode).toEqual('101');
   });
   it('createParty -- invalid non-us', async () => {
     const party = userToParty({
@@ -181,7 +181,7 @@ describe('parties', () => {
     });
     party.primState = 'non-us';
     const { data } = await createParty(party);
-    expect(data.statusCode).toEqual('1422');
+    expect(data.statusCode).toEqual('101');
   });
   it('createParty -- NOUS', async () => {
     const party = userToParty({

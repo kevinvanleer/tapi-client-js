@@ -424,7 +424,7 @@ describe('trades', () => {
           documentFileName: expect.stringMatching(/^[\w]+\.pdf$/),
           documentTitle: 'test-document-0.pdf',
           documentUrl: expect.stringMatching(
-            new RegExp(`^${host}/admin_v3/Upload_documentation/uploadAdminDocument/[a-zA-Z0-9=]*$`),
+            new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
           ),
         },
       ],
