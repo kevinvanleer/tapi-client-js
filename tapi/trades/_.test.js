@@ -234,7 +234,7 @@ describe('trades', () => {
   });
   it('getTradeStatus -- does not exist', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
-    const { data } = await getTradeStatus(createdTradeId + 1);
+    const { data } = await getTradeStatus(createdTradeId + 1e6);
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '189',
@@ -333,7 +333,7 @@ describe('trades', () => {
   it('deleteTrade -- invalid ID nonnumeric', async () => {
     const { data } = await deleteTrade('invalid-trade-id');
     expect(data).toStrictEqual({
-      'Error(s)': '<br />accountIdu0026nbsp;u0026nbsp; : Missing',
+      'Error(s)': '<br />tradeIdu0026nbsp;u0026nbsp; : Missing<br />accountIdu0026nbsp;u0026nbsp; : Missing',
       statusCode: '106',
       statusDesc: 'Data/parameter missing',
     });
@@ -341,10 +341,21 @@ describe('trades', () => {
   it('deleteTrade -- invalid ID numeric', async () => {
     const { data } = await deleteTrade(123.4123);
     expect(data).toStrictEqual({
-      'Error(s)': '<br />accountIdu0026nbsp;u0026nbsp; : Missing',
+      'Error(s)': '<br />tradeIdu0026nbsp;u0026nbsp; : Missing<br />accountIdu0026nbsp;u0026nbsp; : Missing',
       statusCode: '106',
       statusDesc: 'Data/parameter missing',
     });
+  });
+  it('deleteTrade -- no accountId', async () => {
+    expect(createdTradeId).toMatch(/[0-9]+/);
+    const { data } = await deleteTrade(createdTradeId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        'Error(s)': '<br />accountIdu0026nbsp;u0026nbsp; : Missing',
+        statusCode: '106',
+        statusDesc: 'Data/parameter missing',
+      }),
+    );
   });
   it('deleteTrade -- wrong status', async () => {
     expect(createdTradeId).toMatch(/[0-9]+/);
