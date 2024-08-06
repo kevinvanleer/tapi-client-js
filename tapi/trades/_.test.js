@@ -349,7 +349,14 @@ describe('trades', () => {
     );
     expect(data.trades).toHaveLength(10);
   });
-
+  it('getTrades -- XSS', async () => {
+    const response = await getTrades({ filter: ['<script>alert("Hello!")</script>'] });
+    expect(response.status).toStrictEqual(400);
+  });
+  it('getTrades -- SQL injection', async () => {
+    const response = await getTrades({ filter: ['SELECT * FROM transact_party'] });
+    expect(response.status).toStrictEqual(400);
+  });
   it('getTrades -- offset NaN', async () => {
     const { data } = await getTrades({ offset: 'start', limit: 10 });
     expect(data.trades).toHaveLength(0);
