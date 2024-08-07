@@ -151,7 +151,48 @@ describe('accounts', () => {
     );
     expect(data.accountDetails).toHaveLength(10);
   });
-
+  it('getAccounts -- invalid client ID', async () => {
+    const { data: get } = await getAccounts(
+      {},
+      {
+        headers: {
+          Authorization: `Bearer invalid:${process.env.TAPI_API_KEY}`,
+        },
+      },
+    );
+    expect(get).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+    const { data } = await getAccountsPost({}, { clientID: 'invalid-client-id' });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+  });
+  it('getAccounts -- invalid API key', async () => {
+    const { data } = await getAccountsPost({}, { developerAPIKey: 'invalid-api-key' });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+    const { data: get } = await getAccounts(
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.TAPI_CLIENT_ID}:invalid`,
+        },
+      },
+    );
+    expect(get).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+  });
   it('getAccounts -- offset NaN', async () => {
     const { data } = await getAccounts({ offset: 'start', limit: 10 });
     expect(data.accountDetails).toHaveLength(0);

@@ -7,8 +7,9 @@ const createParty = (party) => put('/createParty', party);
 const updateParty = (party) => post('/updateParty', party);
 
 const getAllParties = (offset, limit, deleted) => post('/getAllParties', { offset, limit, deleted });
-const getPartiesGet = ({ offset, limit, deleted, type }) => get('/parties', { offset, limit, deleted, type });
-const getPartiesPost = ({ offset, limit, deleted, type }) => post('/getParties', { offset, limit, deleted, type });
+const getPartiesGet = ({ offset, limit, deleted, type }, config) => get('/parties', { offset, limit, deleted, type }, config);
+const getPartiesPost = ({ offset, limit, deleted, type }, authOverride) =>
+  post('/getParties', { ...authOverride, offset, limit, deleted, type });
 const getParty = (partyId) => post('/getParty', { partyId });
 const deleteParty = (partyId) => post('/deleteParty', { partyId });
 

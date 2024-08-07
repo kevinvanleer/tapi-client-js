@@ -162,7 +162,50 @@ describe('entities', () => {
     );
     expect(data.entityDetails).toHaveLength(10);
   });
-
+  it('getEntities -- invalid client ID', async () => {
+    const getRes = await getEntities(
+      {},
+      {
+        headers: {
+          Authorization: `Bearer invalid:${process.env.TAPI_API_KEY}`,
+        },
+      },
+    );
+    expect(getRes.status).toStrictEqual(401);
+    expect(getRes.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+    const postRes = await getEntitiesPost({}, { clientID: 'invalid-client-id' });
+    expect(postRes.status).toStrictEqual(401);
+    expect(postRes.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+  });
+  it('getEntities -- invalid API key', async () => {
+    const { data } = await getEntitiesPost({}, { developerAPIKey: 'invalid-api-key' });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+    const { data: get } = await getEntities(
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.TAPI_CLIENT_ID}:invalid`,
+        },
+      },
+    );
+    expect(get).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+  });
   it('getEntities -- offset NaN', async () => {
     const { data } = await getEntities({ offset: 'start', limit: 10 });
     expect(data.entityDetails).toHaveLength(0);

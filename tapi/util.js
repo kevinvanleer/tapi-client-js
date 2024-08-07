@@ -18,7 +18,7 @@ const auth = {
 const tapi = axios.create({
   baseURL: tapiUri,
   timeout: 60000,
-  headers: { accept: mimeType, 'content-type': mimeType, Authorization: `Bearer ${auth.clientID}:${auth.developerAPIKey}` },
+  headers: { accept: mimeType, 'content-type': mimeType },
   validateStatus(status) {
     return status >= 200 && status < 500; // default
   },
@@ -46,7 +46,12 @@ if (process.env.TAPI_CLIENT_ID == null)
   console.warn('WARNING: TAPI client is not defined. Check your environment configuration.');
 if (process.env.TAPI_API_KEY == null) console.warn('WARNING: TAPI API key is not defined. Check your environment configuration.');
 
-const get = (command, payload, config) => tapi.get(command, { params: { ...payload }, ...config });
+const get = (command, payload, config) =>
+  tapi.get(command, {
+    params: { ...payload },
+    headers: { Authorization: `Bearer ${auth.clientID}:${auth.developerAPIKey}` },
+    ...config,
+  });
 const put = (command, payload, config) => tapi.put(command, { ...auth, ...payload }, config);
 const post = (command, payload, config) => tapi.post(command, { ...auth, ...payload }, config);
 const execute = (command, payload, method) => {

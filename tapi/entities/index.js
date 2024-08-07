@@ -5,8 +5,9 @@ const createEntity = (entity) => put('/createEntity', entity);
 const updateEntity = (entity) => post('/updateEntity', entity);
 
 const getEntity = (entityId) => post('/getEntity', { partyId: entityId });
-const getEntitiesGet = ({ offset, limit, deleted }) => get('/entities', { offset, limit, deleted });
-const getEntitiesPost = ({ offset, limit, deleted }) => post('/getEntities', { offset, limit, deleted });
+const getEntitiesGet = ({ offset, limit, deleted }, config) => get('/entities', { offset, limit, deleted }, config);
+const getEntitiesPost = ({ offset, limit, deleted }, authOverride) =>
+  post('/getEntities', { ...authOverride, offset, limit, deleted });
 const deleteEntity = (partyId) => post('/deleteEntity', { partyId });
 
 const upsertEntity = (entity) => (entity.partyId ? updateEntity(entity) : createEntity(entity));

@@ -14,8 +14,9 @@ const updateAccount = (user) => put('/updateAccount', makeIndividualAccount(user
 
 const upsertAccount = (user) => (user.accountId ? updateAccount(user) : createAccount(user));
 
-const getAccountsGet = ({ offset, limit, deleted }) => get('/accounts', { offset, limit, deleted });
-const getAccountsPost = ({ offset, limit, deleted }) => post('/getAccounts', { offset, limit, deleted });
+const getAccountsGet = ({ offset, limit, deleted }, config) => get('/accounts', { offset, limit, deleted }, config);
+const getAccountsPost = ({ offset, limit, deleted }, authOverride) =>
+  post('/getAccounts', { ...authOverride, offset, limit, deleted });
 const getAllAccounts = () => post('/getAllAccounts');
 const getAccount = (accountId) => post('/getAccount', { accountId });
 const deleteAccount = (accountId) => post('/deleteAccount', { accountId });
