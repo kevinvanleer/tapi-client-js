@@ -25,7 +25,21 @@ describe('authorization', () => {
     });
     expect(res.status).toStrictEqual(200);
   });
-  it('header authorization url-encoded', async () => {
+  it('header authorization post url-encoded', async () => {
+    const res = await tapi.post(
+      '/getParties',
+      {},
+      {
+        headers: {
+          accept: urlEncodedType,
+          'content-type': urlEncodedType,
+          Authorization: `Bearer ${auth.clientID}:${auth.developerAPIKey}`,
+        },
+      },
+    );
+    expect(res.status).toStrictEqual(200);
+  });
+  it('header authorization post url-encoded with body auth', async () => {
     const res = await tapi.post(
       '/getParties',
       { ...auth },
@@ -33,6 +47,34 @@ describe('authorization', () => {
         headers: {
           accept: urlEncodedType,
           'content-type': urlEncodedType,
+          Authorization: `Bearer ${auth.clientID}:${auth.developerAPIKey}`,
+        },
+      },
+    );
+    expect(res.status).toStrictEqual(200);
+  });
+  it('header authorization post json', async () => {
+    const res = await tapi.post(
+      '/getParties',
+      {},
+      {
+        headers: {
+          accept: jsonType,
+          'content-type': jsonType,
+          Authorization: `Bearer ${auth.clientID}:${auth.developerAPIKey}`,
+        },
+      },
+    );
+    expect(res.status).toStrictEqual(200);
+  });
+  it('header authorization post json with body auth', async () => {
+    const res = await tapi.post(
+      '/getParties',
+      { ...auth },
+      {
+        headers: {
+          accept: jsonType,
+          'content-type': jsonType,
           Authorization: `Bearer ${auth.clientID}:${auth.developerAPIKey}`,
         },
       },
