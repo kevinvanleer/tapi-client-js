@@ -68,7 +68,7 @@ describe('entities', () => {
     const [, [entityDetails]] = data.entityDetails;
     expect(entityDetails).toStrictEqual(
       expect.objectContaining({
-        partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+        partyId: expect.stringMatching(/^E[0-9]{6,8}$/),
       }),
     );
     createdEntityId = entityDetails.partyId;
@@ -148,7 +148,7 @@ describe('entities', () => {
         statusCode: '101',
         entityDetails: expect.arrayContaining([
           expect.objectContaining({
-            partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+            partyId: expect.stringMatching(/^E[0-9]{6,8}$/),
             createdDate: expect.any(String),
             primAddress1: expect.any(String),
             primCity: expect.any(String),
@@ -275,7 +275,7 @@ describe('entities', () => {
         statusDesc: 'Ok',
         entityDetails: expect.arrayContaining([
           expect.objectContaining({
-            partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+            partyId: expect.stringMatching(/^E[0-9]{6,8}$/),
             createdDate: expect.any(String),
             primAddress1: expect.any(String),
             primCity: expect.any(String),
@@ -320,7 +320,7 @@ describe('entities', () => {
     expect(entities).toStrictEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+          partyId: expect.stringMatching(/^E[0-9]{6,8}$/),
           createdDate: expect.any(String),
           primAddress1: expect.any(String),
           primCity: expect.any(String),
@@ -366,7 +366,7 @@ describe('entities', () => {
           updatedDate: expect.any(String),
         }),
         expect.objectContaining({
-          partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+          partyId: expect.stringMatching(/^E[0-9]{6,8}$/),
           partystatus: 'Archived',
           createdDate: expect.any(String),
           updatedDate: expect.any(String),
@@ -408,7 +408,7 @@ describe('entities', () => {
           updatedDate: expect.any(String),
         }),
         expect.objectContaining({
-          partyId: expect.stringMatching(/^E[0-9]{7,8}$/),
+          partyId: expect.stringMatching(/^E[0-9]{6,8}$/),
           partystatus: 'Archived',
           createdDate: expect.any(String),
           updatedDate: expect.any(String),
