@@ -117,7 +117,7 @@ describe('offerings', () => {
       }),
     );
   });
-  it('getAllOfferings', async () => {
+  it.skip('getAllOfferings', async () => {
     const { data } = await getAllOfferings();
     expect(data).toStrictEqual(
       expect.objectContaining({

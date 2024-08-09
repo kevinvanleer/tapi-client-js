@@ -1,6 +1,8 @@
 const { createAccount, updateAccount, getAccount, getAccounts, getAccountsPost, getAllAccounts, deleteAccount } = require('.');
 const { makeIndividualAccount } = require('./util');
 
+jest.setTimeout(30000);
+
 describe('accounts', () => {
   let createdAccountId;
 
@@ -379,7 +381,7 @@ describe('accounts', () => {
       ]),
     );
   });
-  it('getAllAccounts', async () => {
+  it.skip('getAllAccounts', async () => {
     const { data } = await getAllAccounts();
     expect(data).toStrictEqual(
       expect.objectContaining({

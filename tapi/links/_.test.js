@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const { createLink, createAccountLink, linkAccountIndividual, linkAccountOwner, deleteLink, getLink, getAllLinks } = require('.');
 const { createAccount } = require('../accounts');
 const { createParty } = require('../parties');
+const { userToParty } = require('../parties/util');
 const { createEntity } = require('../entities');
 
 jest.setTimeout(20000);
@@ -20,7 +21,7 @@ const getPartyId = async () => {
     usa_citizenship_status: 'citizen',
   };
 
-  const { data: partyData } = await createParty(user);
+  const { data: partyData } = await createParty(userToParty(user));
   const [, [partyDetails]] = partyData.partyDetails;
   return partyDetails.partyId;
 };
