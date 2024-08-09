@@ -633,7 +633,7 @@ describe('trades', () => {
       }),
     );
   });
-  it.skip('getTrades -- get last trades w/ deleted', async () => {
+  it('getTrades -- get last trades w/ deleted', async () => {
     const limit = 50;
     let offset = 0;
 
@@ -669,7 +669,7 @@ describe('trades', () => {
       ]),
     );
   });
-  it.skip('getTrades -- POST get last trades w/ deleted', async () => {
+  it('getTrades -- POST get last trades w/ deleted', async () => {
     const limit = 50;
     let offset = 0;
 
