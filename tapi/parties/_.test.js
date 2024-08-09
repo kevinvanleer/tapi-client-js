@@ -1,4 +1,5 @@
 const { omit } = require('lodash');
+const FormData = require('form-data');
 const {
   createParty,
   updateParty,
@@ -11,6 +12,7 @@ const {
   getPartyDocument,
 } = require('.');
 const { userToParty, hasRequiredPartyFields } = require('./util');
+const { tapi, auth } = require('../util');
 
 jest.setTimeout(120000);
 
@@ -93,6 +95,16 @@ describe('parties', () => {
       }),
     );
     createdPartyId = partyDetails.partyId;
+  });
+  it('createParty -- form data', async () => {
+    expect(hasRequiredPartyFields(validUser)).toBe(true);
+    const body = new FormData();
+    Object.entries(userToParty(validUser)).forEach(([key, value]) => body.append(key, value));
+    body.append('clientID', auth.clientID);
+    body.append('developerAPIKey', auth.developerAPIKey);
+    const res = await tapi.put('/createParty', body, { headers: { ...body.getHeaders() } });
+    expect(res.status).toEqual(401);
+    expect(res.data.statusCode).toEqual('103');
   });
   it('createParty -- missing required field (email)', async () => {
     const user = {
@@ -284,6 +296,23 @@ describe('parties', () => {
         partyDetails: [
           expect.objectContaining({
             ...userToParty({ ...validUser, partyId: createdPartyId }),
+          }),
+        ],
+      }),
+    );
+  });
+  it('getParty -- form data', async () => {
+    const body = new FormData();
+    body.append('clientID', auth.clientID);
+    body.append('developerAPIKey', auth.developerAPIKey);
+    body.append('partyId', global.partyId);
+    const { data } = await tapi.post('/getParty', body, { headers: { ...body.getHeaders() } });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        partyDetails: [
+          expect.objectContaining({
+            ...userToParty({ ...validUser, partyId: global.partyId }),
           }),
         ],
       }),

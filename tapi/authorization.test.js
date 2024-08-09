@@ -1,4 +1,5 @@
 const axios = require('axios');
+const FormData = require('form-data');
 const { auth } = require('./util');
 
 jest.setTimeout(20000);
@@ -24,6 +25,7 @@ describe('authorization', () => {
       },
     });
     expect(res.status).toStrictEqual(200);
+    expect(res.data.statusCode).toStrictEqual('101');
   });
   it('header authorization post url-encoded', async () => {
     const res = await tapi.post(
@@ -38,6 +40,7 @@ describe('authorization', () => {
       },
     );
     expect(res.status).toStrictEqual(200);
+    expect(res.data.statusCode).toStrictEqual('101');
   });
   it('header authorization post url-encoded with body auth', async () => {
     const res = await tapi.post(
@@ -52,6 +55,7 @@ describe('authorization', () => {
       },
     );
     expect(res.status).toStrictEqual(200);
+    expect(res.data.statusCode).toStrictEqual('101');
   });
   it('header authorization post json', async () => {
     const res = await tapi.post(
@@ -66,6 +70,7 @@ describe('authorization', () => {
       },
     );
     expect(res.status).toStrictEqual(200);
+    expect(res.data.statusCode).toStrictEqual('101');
   });
   it('header authorization post json with body auth', async () => {
     const res = await tapi.post(
@@ -80,6 +85,7 @@ describe('authorization', () => {
       },
     );
     expect(res.status).toStrictEqual(200);
+    expect(res.data.statusCode).toStrictEqual('101');
   });
   it('body authorization json', async () => {
     const res = await tapi.post(
@@ -93,6 +99,7 @@ describe('authorization', () => {
       },
     );
     expect(res.status).toStrictEqual(200);
+    expect(res.data.statusCode).toStrictEqual('101');
   });
   it('body authorization url-encoded', async () => {
     const res = await tapi.post(
@@ -106,5 +113,30 @@ describe('authorization', () => {
       },
     );
     expect(res.status).toStrictEqual(200);
+    expect(res.data.statusCode).toStrictEqual('101');
+  });
+  it('body authorization form-data', async () => {
+    const body = new FormData();
+    body.append('clientID', auth.clientID);
+    body.append('developerAPIKey', auth.developerAPIKey);
+    const res = await tapi.post('/getParties', body, {
+      headers: {
+        ...body.getHeaders(),
+      },
+    });
+    expect(res.status).toStrictEqual(200);
+    expect(res.data.statusCode).toStrictEqual('101');
+  });
+  it('body authorization form-data put fails', async () => {
+    const body = new FormData();
+    body.append('clientID', auth.clientID);
+    body.append('developerAPIKey', auth.developerAPIKey);
+    const res = await tapi.put('/getParties', body, {
+      headers: {
+        ...body.getHeaders(),
+      },
+    });
+    expect(res.status).toStrictEqual(401);
+    expect(res.data.statusCode).toStrictEqual('103');
   });
 });
