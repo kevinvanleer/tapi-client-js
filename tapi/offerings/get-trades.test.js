@@ -10,7 +10,7 @@ describe('offerings/get-trades', () => {
 
   beforeAll(async () => {
     const { data: offering } = await offerings.createOffering({
-      issuerId: process.env.TAPI_TEST_ISSUER_ID,
+      issuerId: global.issuerId,
       issueName: 'Test issue',
       issueType: 'Equity',
       minAmount: '1',

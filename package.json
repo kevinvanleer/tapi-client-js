@@ -79,7 +79,8 @@
       "/cdk/"
     ],
     "setupFilesAfterEnv": [
-      "./setupParty.js"
+      "./setupParty.js",
+      "./setupIssuer.js"
     ]
   }
 }

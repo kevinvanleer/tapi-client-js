@@ -1,5 +1,7 @@
 const { createIssuer, updateIssuer, getAllIssuers, getIssuer, deleteIssuer } = require('.');
 
+jest.setTimeout(120000);
+
 describe('issuers', () => {
   const issuer = {
     issuerName: 'Test issuer',

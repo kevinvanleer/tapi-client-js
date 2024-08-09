@@ -1,30 +1,33 @@
 const { createOffering, updateOffering, getAllOfferings, getOffering, deleteOffering } = require('.');
 
 describe('offerings', () => {
-  const issuerId = process.env.TAPI_TEST_ISSUER_ID;
-  const offering = {
-    issuerId,
-    issueName: 'Test issue',
-    issueType: 'Test type',
-    targetAmount: '0',
-    minAmount: '0',
-    maxAmount: '0',
-    unitPrice: '0',
-    startDate: 'unknown',
-    endDate: 'unknown',
-    offeringText: 'n/a',
-    stampingText: 'n/a',
-  };
-  const validOffering = {
-    ...offering,
-    issueType: 'Equity',
-    targetAmount: '5',
-    maxAmount: '10',
-    unitPrice: '1',
-    startDate: '01-01-1970',
-    endDate: '01-01-1970',
-  };
   let createdOfferingId;
+  let offering;
+  let validOffering;
+  beforeAll(() => {
+    offering = {
+      issuerId: global.issuerId,
+      issueName: 'Test issue',
+      issueType: 'Test type',
+      targetAmount: '0',
+      minAmount: '0',
+      maxAmount: '0',
+      unitPrice: '0',
+      startDate: 'unknown',
+      endDate: 'unknown',
+      offeringText: 'n/a',
+      stampingText: 'n/a',
+    };
+    validOffering = {
+      ...offering,
+      issueType: 'Equity',
+      targetAmount: '5',
+      maxAmount: '10',
+      unitPrice: '1',
+      startDate: '01-01-1970',
+      endDate: '01-01-1970',
+    };
+  });
   it('createOffering -- invalid', async () => {
     const { data } = await createOffering(offering);
     expect(data.statusDesc).not.toEqual('Ok');
