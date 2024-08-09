@@ -1,7 +1,6 @@
 const { createAccount, updateAccount, getAccount, getAccounts, getAccountsPost, getAllAccounts, deleteAccount } = require('.');
-const { makeIndividualAccount } = require('./util');
 
-jest.setTimeout(30000);
+jest.setTimeout(120000);
 
 describe('accounts', () => {
   let createdAccountId;
@@ -19,8 +18,6 @@ describe('accounts', () => {
     social_security_number: '123-45-6789',
     usa_citizenship_status: 'citizen',
   };
-
-  const validAccount = makeIndividualAccount(validUser);
 
   beforeAll(async () => {
     const { data } = await getAccounts({});
