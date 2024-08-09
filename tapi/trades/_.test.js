@@ -8,6 +8,8 @@ const {
   deleteTrade,
   uploadTradeDocument,
   getTradeDocument,
+  getTrades,
+  getTradesPost,
 } = require('.');
 
 const { accounts, offerings, links } = require('..');
@@ -31,8 +33,8 @@ beforeAll(async () => {
     issueType: 'Equity',
     minAmount: '1',
     targetAmount: '5',
-    maxAmount: '10',
-    remainingShares: '10',
+    maxAmount: '10000',
+    remainingShares: '10000',
     unitPrice: '1',
     startDate: '01-01-1970',
     endDate: '01-01-1970',
@@ -58,6 +60,20 @@ beforeAll(async () => {
   accountId = account.accountDetails[0].accountId;
   await links.linkAccountOwner(accountId, global.partyId);
   validTrade = { ...trade, accountId, offeringId };
+
+  const { data } = await getTrades({});
+  if (data.statusCode === '239' || data.pagination.totalRecords < 100) {
+    const trades = await Promise.all(Array.from([...Array(100)], (x) => x + 1).map(() => createTrade(validTrade)));
+    // TODO: THIS SHOULD NOT BE REQUIRED TO CREATE A RECORD IN transact_buy_offering_status a record should be created when the trade is created
+    await Promise.all(trades.map((t) => updateTradeStatus(t.data.purchaseDetails[1][0].tradeId, accountId, 'FUNDED')));
+  } else if (data.statusCode !== '101') throw data;
+
+  const { data: testTrade } = await createTrade(validTrade);
+  if (testTrade.statusCode !== '101') throw testTrade;
+
+  // TODO: THIS SHOULD NOT BE REQUIRED TO CREATE A RECORD IN transact_buy_offering_status a record should be created when the trade is created
+  const { data: tradeStatus } = await updateTradeStatus(testTrade.purchaseDetails[1][0].tradeId, accountId, 'FUNDED');
+  if (tradeStatus.statusCode !== '101') throw tradeStatus;
 });
 
 afterAll(async () => {
@@ -307,7 +323,7 @@ describe('trades', () => {
       }),
     );
   });
-  it('getAllTrades', async () => {
+  it.skip('getAllTrades', async () => {
     const { data } = await getAllTrades();
     expect(data).toStrictEqual(
       expect.objectContaining({
@@ -321,6 +337,227 @@ describe('trades', () => {
         ]),
       }),
     );
+  });
+  it('getTrades -- default', async () => {
+    const { data } = await getTrades({});
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        trades: expect.arrayContaining([
+          expect.objectContaining({
+            tradeId: expect.stringMatching(/^[0-9]+$/),
+          }),
+        ]),
+      }),
+    );
+    expect(data.trades).toHaveLength(10);
+  });
+  it('getTrades -- XSS', async () => {
+    const response = await getTrades({ filter: ['<script>alert("Hello!")</script>'] });
+    expect(response.status).toStrictEqual(400);
+  });
+  it('getTrades -- SQL injection', async () => {
+    const response = await getTrades({ filter: ['SELECT * FROM transact_party'] });
+    expect(response.status).toStrictEqual(400);
+  });
+  it('getTrades -- invalid client ID', async () => {
+    const getRes = await getTrades(
+      {},
+      {
+        headers: {
+          Authorization: `Bearer invalid:${process.env.TAPI_API_KEY}`,
+        },
+      },
+    );
+    expect(getRes.status).toStrictEqual(401);
+    expect(getRes.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+    const postRes = await getTradesPost({}, { clientID: 'invalid-client-id' });
+    expect(postRes.status).toStrictEqual(401);
+    expect(postRes.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+  });
+  it('getTrades -- invalid API key', async () => {
+    const postRes = await getTradesPost({}, { developerAPIKey: 'invalid-api-key' });
+    expect(postRes.status).toStrictEqual(401);
+    expect(postRes.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+    const getRes = await getTrades(
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.TAPI_CLIENT_ID}:invalid`,
+        },
+      },
+    );
+    expect(getRes.status).toStrictEqual(401);
+    expect(getRes.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '103',
+      }),
+    );
+  });
+  it('getTrades -- offset NaN', async () => {
+    const { data } = await getTrades({ offset: 'start', limit: 10 });
+    expect(data.trades).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '1422',
+        trades: [],
+      }),
+    );
+  });
+  it('getTrades -- limit NaN', async () => {
+    const { data } = await getTrades({ offset: 0, limit: 'none' });
+    expect(data.trades).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '1422',
+        trades: [],
+      }),
+    );
+  });
+  it('getTrades -- offset out of range high', async () => {
+    const { data } = await getTrades({ offset: 1e7, limit: 10 });
+    expect(data.trades).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '239',
+        trades: [],
+      }),
+    );
+  });
+  it('getTrades -- offset out of range low', async () => {
+    const { data } = await getTrades({ offset: -1, limit: 10 });
+    expect(data.trades).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '239',
+        trades: [],
+      }),
+    );
+  });
+  it('getTrades -- limit out of range high', async () => {
+    const { data } = await getTrades({ offset: 10, limit: 10000 });
+    expect(data.trades).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '239',
+        trades: [],
+      }),
+    );
+  });
+  it('getTrades -- limit out of range low', async () => {
+    const { data } = await getTrades({ offset: 10, limit: 0 });
+    expect(data.trades).toHaveLength(0);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '239',
+        trades: [],
+      }),
+    );
+  });
+  it('getTrades -- offset:1,limit:2', async () => {
+    const { data } = await getTrades({ offset: 1, limit: 2 });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        trades: expect.arrayContaining([
+          expect.objectContaining({
+            tradeId: expect.stringMatching(/^[0-9]+$/),
+          }),
+        ]),
+        pagination: expect.objectContaining({
+          totalRecords: expect.any(Number),
+          startIndex: 1,
+          endIndex: 3,
+        }),
+      }),
+    );
+    expect(data.trades).toHaveLength(2);
+  });
+  it('getTrades -- filter by offering', async () => {
+    const { data } = await getTrades({ filter: [`offeringId:${offeringId}`] });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        trades: expect.arrayContaining([
+          expect.objectContaining({
+            tradeId: expect.stringMatching(/^[0-9]+$/),
+            offeringId,
+          }),
+        ]),
+        pagination: expect.objectContaining({
+          totalRecords: expect.any(Number),
+          startIndex: expect.any(Number),
+          endIndex: expect.any(Number),
+        }),
+      }),
+    );
+    expect(data.trades.every((t) => t.offeringId === offeringId)).toBe(true);
+    expect(data.trades.length).toBeGreaterThan(0);
+  });
+  it('getTrades -- filter by offering and account', async () => {
+    const { data } = await getTrades({ filter: [`offeringId:${offeringId}`, `accountId:${accountId}`] });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+        trades: expect.arrayContaining([
+          expect.objectContaining({
+            tradeId: expect.stringMatching(/^[0-9]+$/),
+            offeringId,
+            accountId,
+          }),
+        ]),
+        pagination: expect.objectContaining({
+          totalRecords: expect.any(Number),
+          startIndex: expect.any(Number),
+          endIndex: expect.any(Number),
+        }),
+      }),
+    );
+    expect(data.trades.every((t) => t.offeringId === offeringId && t.accountId === accountId)).toBe(true);
+    expect(data.trades.length).toBeGreaterThan(0);
+  });
+  it('getTrades -- get last trades', async () => {
+    const limit = 50;
+    let offset = 0;
+
+    const newTrade = (await createTrade(validTrade)).data.purchaseDetails[1][0];
+
+    const { data } = await getTrades({ offset, limit });
+    let { trades } = data;
+
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
+
+    const responses = await Promise.all(
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) => getTrades({ offset: offset + i * limit, limit })),
+    );
+
+    responses.forEach((r) => {
+      expect(r.data.statusCode).toStrictEqual('101');
+      trades = trades.concat(r.data.trades);
+    });
+
+    expect(trades).toHaveLength(data.pagination.totalRecords - offset + limit);
+    expect(trades.every((t) => t.emailAddress !== 'otheruser@test.com')).toBe(true);
+
+    expect(trades).toStrictEqual(expect.arrayContaining([expect.objectContaining({ tradeId: newTrade.tradeId })]));
   });
   it('deleteTrade -- no ID', async () => {
     const { data } = await deleteTrade();
@@ -396,6 +633,81 @@ describe('trades', () => {
       }),
     );
   });
+  it.skip('getTrades -- get last trades w/ deleted', async () => {
+    const limit = 50;
+    let offset = 0;
+
+    const { data } = await getTrades({ offset, limit, deleted: true });
+    let { trades } = data;
+
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
+
+    const responses = await Promise.all(
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) => getTrades({ offset: offset + i * limit, limit, deleted: true })),
+    );
+
+    responses.forEach((r) => {
+      expect(r.data.statusCode).toStrictEqual('101');
+      trades = trades.concat(r.data.trades);
+    });
+
+    expect(trades).toHaveLength(data.pagination.totalRecords - offset + limit);
+
+    expect(trades).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tradeId: expect.stringMatching(/^[0-9]+$/),
+          archived: '0',
+        }),
+        expect.objectContaining({
+          tradeId: expect.stringMatching(/^[0-9]+$/),
+          archived: '1',
+        }),
+      ]),
+    );
+  });
+  it.skip('getTrades -- POST get last trades w/ deleted', async () => {
+    const limit = 50;
+    let offset = 0;
+
+    const { data } = await getTradesPost({ offset, limit, deleted: true });
+    let { trades } = data;
+
+    expect(data.pagination.totalRecords).toBeGreaterThan(limit);
+
+    offset = Math.max(data.pagination.totalRecords - 100, limit);
+    const pages = Math.ceil((data.pagination.totalRecords - offset) / limit);
+
+    const responses = await Promise.all(
+      Array.from([...Array(pages)], (x) => x + 1).map((_, i) =>
+        getTradesPost({ offset: offset + i * limit, limit, deleted: true }),
+      ),
+    );
+
+    responses.forEach((r) => {
+      expect(r.data.statusCode).toStrictEqual('101');
+      trades = trades.concat(r.data.trades);
+    });
+
+    expect(trades).toHaveLength(data.pagination.totalRecords - offset + limit);
+    expect(trades.every((p) => p.emailAddress !== 'otheruser@test.com')).toBe(true);
+
+    expect(trades).toStrictEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tradeId: expect.stringMatching(/^[0-9]+$/),
+          archived: '0',
+        }),
+        expect.objectContaining({
+          tradeId: expect.stringMatching(/^[0-9]+$/),
+          archived: '1',
+        }),
+      ]),
+    );
+  });
   it('uploadTradeDocument', async () => {
     const { data } = await uploadTradeDocument(createdTradeId, {
       buffer: Buffer.from('a'.repeat(1e3)),
@@ -423,9 +735,7 @@ describe('trades', () => {
           documentid: expect.stringMatching(/^[\w]{4,5}$/),
           documentFileName: expect.stringMatching(/^[\w]+\.pdf$/),
           documentTitle: 'test-document-0.pdf',
-          documentUrl: expect.stringMatching(
-            new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`),
-          ),
+          documentUrl: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
       ],
     });

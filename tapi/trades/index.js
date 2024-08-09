@@ -1,11 +1,15 @@
 const FormData = require('form-data');
 const { Readable } = require('stream');
 
-const { tapi, auth, post, put } = require('../util');
+const { tapi, auth, post, put, get } = require('../util');
 
 const getTrade = (tradeId, accountId) => post('/getTrade', { tradeId, accountId });
 
 const getAllTrades = () => post('/getAllTrades');
+
+const getTradesGet = ({ offset, limit, deleted, filter }, config) => get('/trades', { offset, limit, deleted, filter }, config);
+const getTradesPost = ({ offset, limit, deleted, filter }, authOverride) =>
+  post('/getTrades', { ...authOverride, offset, limit, deleted, filter });
 
 const createTrade = (trade) => post('/createTrade', trade);
 
@@ -43,6 +47,9 @@ module.exports = {
   createTrade,
   editTrade,
   getAllTrades,
+  getTrades: getTradesGet,
+  getTradesGet,
+  getTradesPost,
   deleteTrade,
   cancelTrade,
   getPaymentInfo,
