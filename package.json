@@ -8,6 +8,7 @@
     "test:qa": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-qa && NODE_ENV=test jest --runInBand",
     "test:sandbox": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-sandbox && NODE_ENV=test jest --runInBand",
     "test:all": "npm run test:qa ; npm run test:sandbox",
+    "test:ci": "npm run test util.test authorization.test parties/_ entities/_ accounts/_ links/_ trades/_ offerings/_ issuers/_ exports/_ jobs/_",
     "tapi": "node ./tapi/tools/execute.mjs",
     "upload-test-report": "aws s3 sync ./html-report/ s3://tapitestreportstack-tapitestreportbucket4eea3b17-c8jwb9b43yqk/",
     "invalidate-test-report": "aws cloudfront create-invalidation --distribution-id E1DQQHLZFTPAHA --paths '/*'",
