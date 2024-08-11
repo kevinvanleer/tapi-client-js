@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run test:ci
+
+reports:
+  jest_reports:
+    files:
+      - jest.xml
+    file-format: JUNITXML
+    base-directory: aws-codebuild-test-output
