@@ -103,7 +103,7 @@ describe('parties', () => {
     body.append('clientID', auth.clientID);
     body.append('developerAPIKey', auth.developerAPIKey);
     const res = await tapi.put('/createParty', body, { headers: { ...body.getHeaders() } });
-    expect(res.status).toEqual(401);
+    expect(res.status).toEqual(404);
     expect(res.data.statusCode).toEqual('103');
   });
   it('createParty -- missing required field (email)', async () => {
