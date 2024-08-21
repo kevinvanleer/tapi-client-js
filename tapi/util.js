@@ -1,3 +1,5 @@
+/* eslint no-console: ["error", { allow: ["warn", "error"] }] */
+
 const camelize = require('camelize');
 const axios = require('axios');
 const usStateAbbr = require('@stdlib/datasets-us-states-abbr');
@@ -38,7 +40,7 @@ tapi.interceptors.request.use(
 );
 */
 tapi.interceptors.response.use((response) => {
-  if (response.data.developerAPIKey) console.log('CONTAINS API KEY');
+  if (response.data.developerAPIKey) console.warn('CONTAINS API KEY');
   // console.log(response);
   return response;
 });

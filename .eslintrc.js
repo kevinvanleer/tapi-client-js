@@ -30,6 +30,12 @@ module.exports = {
         'import/extensions': ['error', 'always'],
       },
     },
+    {
+      files: ['tapi/tools/**'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
   ],
   rules: {
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/test_util/**', '**/*.test.js', '**/*.spec.js'] }],

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint --fix .",
+    "lint:ci": "eslint .",
     "test": "NODE_ENV=test jest --runInBand",
     "test:qa": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-qa && NODE_ENV=test jest --runInBand",
     "test:sandbox": "npm config set script-shell \"/bin/bash\" ; source .env-tapi-sandbox && NODE_ENV=test jest --runInBand",

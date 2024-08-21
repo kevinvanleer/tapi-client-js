@@ -104,7 +104,7 @@ describe('offerings', () => {
             issueName: validOffering.issueName,
             offeringStatus: 'Approved',
             field1: 'open',
-            issuerId,
+            issuerId: global.issuerId,
           }),
         ]),
       }),

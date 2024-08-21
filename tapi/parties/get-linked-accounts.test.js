@@ -1,5 +1,5 @@
 const uuid = require('uuid');
-const { createLink, createAccountLink, linkAccountIndividual, linkAccountOwner, deleteLink, getLink } = require('../links');
+const { linkAccountOwner } = require('../links');
 const { createAccount, deleteAccount } = require('../accounts');
 const { createParty, deleteParty, getLinkedAccounts } = require('.');
 

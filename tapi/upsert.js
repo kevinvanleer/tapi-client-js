@@ -1,7 +1,9 @@
+/* eslint no-console: ["error", { allow: ["warn", "error"] }] */
+
 const { createParty, updateParty } = require('./parties');
 const { createAccount, updateAccount } = require('./accounts');
 const { linkAccountOwner } = require('./links');
-const { hasRequiredPartyFields } = require('../../../utilities/users');
+const { hasRequiredPartyFields } = require('./parties/util');
 
 const createTapiResources = async (user, db) => {
   const { data: party } = await createParty(user);
@@ -106,7 +108,7 @@ const upsertTapiResources = async (user, db) => {
       }
     }
   } else {
-    console.log('Could not create tapi resources. Required fields are not avaiable.');
+    console.warn('Could not create tapi resources. Required fields are not avaiable.');
   }
 };
 
