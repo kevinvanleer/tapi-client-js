@@ -1,0 +1,4 @@
+node_modules/
+cdk/
+html-report/
+jest-html-reporters-attach/
