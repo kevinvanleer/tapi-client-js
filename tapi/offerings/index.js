@@ -16,7 +16,17 @@ const deleteOffering = (offeringId) => post('/deleteOffering', { offeringId });
 const getTrades = (offeringId) => post('/getTradesForOffering', { offeringId });
 const addSubscriptions = (offeringId, fileName) =>
   post('/addSubscriptionsForOffering', { offeringId, file_name: `templatename0=${fileName}` });
+const updateSubscriptions = (offeringId, templateId, fileName) =>
+  post('/updateSubscriptionsForOffering', { offeringId, templateId, file_name: `templatename0=${fileName}` });
 const getSubscriptions = (offeringId) => post('/getSubscriptionsForOffering', { offeringId });
+const sendSubscriptionDocument = (offeringId, accountId, tradeId) =>
+  post('/sendSubscriptionDocument', { offeringId, accountId, tradeId });
+const sendSubscriptionDocumentClient = (offeringId, accountId, tradeId) =>
+  post('/sendSubscriptionDocumentClient', { offeringId, accountId, tradeId });
+const fetchSubscriptionDocuments = () => post('/fetchSubscriptionDocuments');
+const resendSubscriptionDocuments = (offeringId, accountId, tradeId) =>
+  post('/resendSubscriptionDocuments', { offeringId, accountId, tradeId });
+
 const getDocuments = (offeringId) => post('/getDocumentsForOffering', { offeringId });
 
 const addDocuments = (offeringId, file) => {
@@ -67,7 +77,12 @@ module.exports = {
   getAllOfferings,
   getTrades,
   addSubscriptions,
+  updateSubscriptions,
   getSubscriptions,
+  sendSubscriptionDocument,
+  resendSubscriptionDocuments,
+  sendSubscriptionDocumentClient,
+  fetchSubscriptionDocuments,
   addDocuments,
   updateDocument,
   updateDocumentMetadata,

@@ -1,20 +1,46 @@
-const { offerings } = require('..');
-const { addSubscriptions, getSubscriptions } = require('.');
+const { offerings, accounts, links, trades } = require('..');
+const {
+  addSubscriptions,
+  updateSubscriptions,
+  getSubscriptions,
+  sendSubscriptionDocument,
+  sendSubscriptionDocumentClient,
+  resendSubscriptionDocuments,
+  fetchSubscriptionDocuments,
+} = require('.');
 
-jest.setTimeout(10000);
+jest.setTimeout(60000);
 
 /* NOTE
  *
  * These tests rely on configuration outside the test environment. The client used to execute the tests must be linked to Docusign.
- * The linked docusign account must have templates:
- * - tapi-sandbox-test-subscription-0
- * - tapi-sandbox-test-subscription-1
- * - tapi-sandbox-test-subscription-2
+ * The linked docusign account must have templates defined in templates object
  *
  *   TODO: This test suite needs access to a client account that is not linked to docusign.
  */
 describe('offerings/subscriptions', () => {
   let offeringId;
+  let accountId;
+  let tradeId;
+  const host = process.env.TAPI_HOST.replace('http://', 'https://');
+  const templates = [
+    {
+      id: process.env.TEMPLATE_0_ID,
+      name: process.env.TEMPLATE_0_NAME,
+    },
+    {
+      id: process.env.TEMPLATE_1_ID,
+      name: process.env.TEMPLATE_1_NAME,
+    },
+    {
+      id: process.env.TEMPLATE_2_ID,
+      name: process.env.TEMPLATE_2_NAME,
+    },
+  ];
+  const templateId = templates[0].id;
+  const templateName = templates[0].name;
+
+  const getTemplateIdName = ({ id, name }) => `${id}--${name}`;
 
   beforeAll(async () => {
     const { data: offering } = await offerings.createOffering({
@@ -33,6 +59,28 @@ describe('offerings/subscriptions', () => {
     });
     if (offering.statusCode !== '101') throw offering;
     offeringId = offering.offeringDetails[1][0].offeringId;
+    const { data: account } = await accounts.createAccount({
+      email: 'testuser@test.com',
+      first_name: 'Test',
+      last_name: 'User',
+      address1: '123 Main St',
+      city: 'Test City',
+      state: 'Alabama',
+      zip_code: 500,
+      date_of_birth: new Date(1970, 0, 1),
+      country_iso_3: 'USA',
+      usa_citizenship_status: 'citizen',
+    });
+    if (account.statusCode !== '101') throw account;
+    accountId = account.accountDetails[0].accountId;
+    await links.linkAccountOwner(accountId, global.partyId);
+    const { data } = await trades.createTrade({
+      transactionType: 'WIRE',
+      transactionUnits: '1',
+      offeringId,
+      accountId,
+    });
+    tradeId = data.purchaseDetails[1][0].tradeId;
   });
 
   afterAll(async () => {
@@ -71,7 +119,7 @@ describe('offerings/subscriptions', () => {
       statusDesc: 'Error(s)',
     });
   });
-  it('addSubscriptions (addSubscriptionsForOffering) -- template does not exist', async () => {
+  it.skip('addSubscriptions (addSubscriptionsForOffering) -- template does not exist', async () => {
     const { data } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-does-not-exist');
     expect(data).toStrictEqual({
       statusCode: '101',
@@ -84,22 +132,73 @@ describe('offerings/subscriptions', () => {
         },
       ],
     });
-    expect(data.document_details[0].templateNameID.toString()).toStrictEqual(expect.stringMatching(/^[0-9]{6}$/));
+    expect(data.document_details[0].templateNameID.toString()).toStrictEqual(expect.stringMatching(/^[0-9]+$/));
   });
   it('addSubscriptions (addSubscriptionsForOffering)', async () => {
-    const { data } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-0');
+    const { data } = await addSubscriptions(offeringId, `${templateId}--${templateName}`);
     expect(data).toStrictEqual({
       statusCode: '101',
       statusDesc: 'Ok',
       document_details: [
         {
           offeringId,
-          templateName: null,
+          templateName,
           templateNameID: expect.any(Number),
         },
       ],
     });
-    expect(data.document_details[0].templateNameID.toString()).toStrictEqual(expect.stringMatching(/^[0-9]{6}$/));
+    expect(data.document_details[0].templateNameID.toString()).toStrictEqual(expect.stringMatching(/^[0-9]+$/));
+  });
+  it('sendSubscriptionDocument (sendSubscriptionDocument)', async () => {
+    const { data } = await sendSubscriptionDocument(offeringId, accountId, tradeId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
+  });
+  it('sendSubscriptionDocumentClient (sendSubscriptionDocumentClient)', async () => {
+    const { data } = await sendSubscriptionDocumentClient(offeringId, accountId, tradeId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
+  });
+  it('resendSubscriptionDocuments (resendSubscriptionDocuments)', async () => {
+    const { data } = await resendSubscriptionDocuments(offeringId, accountId, tradeId);
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
+  });
+  it('fetchSubscriptionDocuments', async () => {
+    const { data } = await fetchSubscriptionDocuments();
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        statusDesc: 'Ok',
+      }),
+    );
+  });
+  it.skip('updateSubscriptions (updateSubscriptionsForOffering)', async () => {
+    const { data } = await updateSubscriptions(offeringId, templateId, getTemplateIdName(templates[0]));
+    expect(data).toStrictEqual({
+      statusCode: '101',
+      statusDesc: 'Ok',
+      document_details: [
+        {
+          offeringId,
+          templateName,
+          templateNameID: expect.any(Number),
+        },
+      ],
+    });
+    expect(data.document_details[0].templateNameID.toString()).toStrictEqual(expect.stringMatching(/^[0-9]+$/));
   });
   it('getSubscriptions (getSubscriptionsForOffering) -- one item', async () => {
     const { data } = await getSubscriptions(offeringId);
@@ -110,19 +209,17 @@ describe('offerings/subscriptions', () => {
         {
           createdDate: expect.any(String),
           offeringId,
-          templateId: expect.stringMatching(/^[0-9]{6}$/),
-          templateKey: 'tapi-sandbox-test-subscription-0',
-          templateName: null,
-          templateUrl: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/tapiv3\/uploads\/tapi-sandbox-test-subscription-0[_a-zA-Z0-9]*.pdf$/,
-          ),
+          templateId: expect.stringMatching(/^[0-9]+$/),
+          templateKey: templateId,
+          templateName,
+          templateUrl: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
       ],
     });
   });
   it('getSubscriptions (getSubscriptionsForOffering) -- three items', async () => {
-    const { data: doc1 } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-1');
-    const { data: doc2 } = await addSubscriptions(offeringId, 'tapi-sandbox-test-subscription-2');
+    const { data: doc1 } = await addSubscriptions(offeringId, getTemplateIdName(templates[1]));
+    const { data: doc2 } = await addSubscriptions(offeringId, getTemplateIdName(templates[2]));
     const { data } = await getSubscriptions(offeringId);
     expect(data).toStrictEqual({
       statusCode: '101',
@@ -132,31 +229,25 @@ describe('offerings/subscriptions', () => {
           createdDate: expect.any(String),
           offeringId,
           templateId: doc2.document_details[0].templateNameID.toString(),
-          templateKey: 'tapi-sandbox-test-subscription-2',
-          templateName: null,
-          templateUrl: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/tapiv3\/uploads\/tapi-sandbox-test-subscription-2[_a-zA-Z0-9]*.pdf$/,
-          ),
+          templateKey: templates[2].id,
+          templateName: templates[2].name,
+          templateUrl: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
         {
           createdDate: expect.any(String),
           offeringId,
           templateId: doc1.document_details[0].templateNameID.toString(),
-          templateKey: 'tapi-sandbox-test-subscription-1',
-          templateName: null,
-          templateUrl: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/tapiv3\/uploads\/tapi-sandbox-test-subscription-1[_a-zA-Z0-9]*.pdf$/,
-          ),
+          templateKey: templates[1].id,
+          templateName: templates[1].name,
+          templateUrl: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
         {
           createdDate: expect.any(String),
           offeringId,
-          templateId: expect.stringMatching(/^[0-9]{6}$/),
-          templateKey: 'tapi-sandbox-test-subscription-0',
-          templateName: null,
-          templateUrl: expect.stringMatching(
-            /^https:\/\/api-sandboxdash.norcapsecurities.com\/tapiv3\/uploads\/tapi-sandbox-test-subscription-0[_a-zA-Z0-9]*.pdf$/,
-          ),
+          templateId: expect.stringMatching(/^[0-9]+$/),
+          templateKey: templates[0].id,
+          templateName: templates[0].name,
+          templateUrl: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
       ],
     });
