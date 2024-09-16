@@ -7,6 +7,7 @@ const {
 } = require('.');
 
 const { parties, accounts, links } = require('..');
+const { userToParty } = require('../parties/util');
 
 const testFileNames = {
   need_info: 'Test_Need_Info',
@@ -38,7 +39,7 @@ beforeAll(async () => {
     country_iso_3: 'USA',
     usa_citizenship_status: 'citizen',
   };
-  const { data: party } = await parties.createParty(user);
+  const { data: party } = await parties.createParty(userToParty(user));
   const [, [partyDetails]] = party.partyDetails;
   partyId = partyDetails.partyId;
   const { data: account } = await accounts.createAccount(user);
