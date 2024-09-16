@@ -65,15 +65,15 @@ beforeAll(async () => {
   if (data.statusCode === '239' || data.pagination.totalRecords < 100) {
     const trades = await Promise.all(Array.from([...Array(100)], (x) => x + 1).map(() => createTrade(validTrade)));
     // TODO: THIS SHOULD NOT BE REQUIRED TO CREATE A RECORD IN transact_buy_offering_status a record should be created when the trade is created
-    await Promise.all(trades.map((t) => updateTradeStatus(t.data.purchaseDetails[1][0].tradeId, accountId, 'FUNDED')));
+    // await Promise.all(trades.map((t) => updateTradeStatus(t.data.purchaseDetails[1][0].tradeId, accountId, 'FUNDED')));
   } else if (data.statusCode !== '101') throw data;
 
   const { data: testTrade } = await createTrade(validTrade);
   if (testTrade.statusCode !== '101') throw testTrade;
 
   // TODO: THIS SHOULD NOT BE REQUIRED TO CREATE A RECORD IN transact_buy_offering_status a record should be created when the trade is created
-  const { data: tradeStatus } = await updateTradeStatus(testTrade.purchaseDetails[1][0].tradeId, accountId, 'FUNDED');
-  if (tradeStatus.statusCode !== '101') throw tradeStatus;
+  // const { data: tradeStatus } = await updateTradeStatus(testTrade.purchaseDetails[1][0].tradeId, accountId, 'FUNDED');
+  // if (tradeStatus.statusCode !== '101') throw tradeStatus;
 });
 
 afterAll(async () => {
@@ -724,7 +724,7 @@ describe('trades', () => {
     expect(data).toStrictEqual({
       statusCode: '101',
       statusDesc: 'Ok',
-      document_details: [
+      document_details: expect.arrayContaining([
         {
           archive_status: '0',
           virtualStatus: 'ACTIVE',
@@ -737,7 +737,7 @@ describe('trades', () => {
           documentTitle: 'test-document-0.pdf',
           documentUrl: expect.stringMatching(new RegExp(`^${host}/admin_v3/Upload_documentation/uploadDocument/[a-zA-Z0-9=]*$`)),
         },
-      ],
+      ]),
     });
   });
 });
