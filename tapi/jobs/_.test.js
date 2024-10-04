@@ -24,6 +24,60 @@ const testJob = {
 
 describe('jobs', () => {
   let createdJob;
+  it('createJob -- no payload', async () => {
+    const { data } = await createJob({});
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '1400',
+      }),
+    );
+    createdJob = data.job;
+  });
+
+  it('createJob -- no type', async () => {
+    const { data } = await createJob({ newJob: { instructions: {} } });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '1400',
+        statusDesc: 'Bad request: type missing from job definition',
+      }),
+    );
+    createdJob = data.job;
+  });
+
+  it('createJob -- invalid job type', async () => {
+    const { data } = await createJob({ newJob: { type: 'invalid-job-type' } });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '1400',
+        statusDesc: "Bad request: job type 'invalid-job-type' not supported",
+      }),
+    );
+    createdJob = data.job;
+  });
+
+  it('createJob -- no instructions', async () => {
+    const { data } = await createJob({ newJob: { type: 'export' } });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '1400',
+        statusDesc: 'Bad request: instructions missing from job definition',
+      }),
+    );
+    createdJob = data.job;
+  });
+
+  it('createJob -- no import queue', async () => {
+    const { data } = await createJob({ newJob: { type: 'import', instructions: { filter: {} } } });
+    expect(data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '1400',
+        statusDesc: "Bad request: no job queue for job type 'import'. Not supported",
+      }),
+    );
+    createdJob = data.job;
+  });
+
   it('createJob', async () => {
     const { data } = await createJob(testJob);
     expect(data).toStrictEqual(
