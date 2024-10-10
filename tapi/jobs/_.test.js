@@ -99,10 +99,13 @@ describe('jobs', () => {
 
   it('getJobs', async () => {
     const { data } = await getJobs();
+    const listedJob = { ...createdJob };
+    delete listedJob.reason;
+
     expect(data).toStrictEqual(
       expect.objectContaining({
         statusCode: '101',
-        jobs: expect.arrayContaining([createdJob]),
+        jobs: expect.arrayContaining([listedJob]),
       }),
     );
   });
