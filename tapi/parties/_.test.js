@@ -329,6 +329,7 @@ describe('parties', () => {
         createdDate: expect.any(String),
         updatedDate: expect.any(String),
         partyId: expect.stringMatching(/^P[0-9]{6,8}$/),
+        invest_to: expect.any(String),
       },
       ['AMLstatus', 'KYCstatus', 'AMLdate'],
     );

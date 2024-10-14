@@ -63,17 +63,11 @@ beforeAll(async () => {
 
   const { data } = await getTrades({});
   if (data.statusCode === '239' || data.pagination.totalRecords < 100) {
-    const trades = await Promise.all(Array.from([...Array(100)], (x) => x + 1).map(() => createTrade(validTrade)));
-    // TODO: THIS SHOULD NOT BE REQUIRED TO CREATE A RECORD IN transact_buy_offering_status a record should be created when the trade is created
-    // await Promise.all(trades.map((t) => updateTradeStatus(t.data.purchaseDetails[1][0].tradeId, accountId, 'FUNDED')));
+    await Promise.all(Array.from([...Array(100)], (x) => x + 1).map(() => createTrade(validTrade)));
   } else if (data.statusCode !== '101') throw data;
 
   const { data: testTrade } = await createTrade(validTrade);
   if (testTrade.statusCode !== '101') throw testTrade;
-
-  // TODO: THIS SHOULD NOT BE REQUIRED TO CREATE A RECORD IN transact_buy_offering_status a record should be created when the trade is created
-  // const { data: tradeStatus } = await updateTradeStatus(testTrade.purchaseDetails[1][0].tradeId, accountId, 'FUNDED');
-  // if (tradeStatus.statusCode !== '101') throw tradeStatus;
 });
 
 afterAll(async () => {
@@ -234,7 +228,6 @@ describe('trades', () => {
             archived_status: '0',
             closeId: expect.anything(),
             eligibleToClose: 'no',
-            notes: expect.anything(),
           }),
         ]),
       }),
