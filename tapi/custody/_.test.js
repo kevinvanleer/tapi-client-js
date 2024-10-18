@@ -8,8 +8,8 @@ describe('custody', () => {
     const response = await get('/accounts?limit=1');
     accountId = response.data.accountDetails[0].accountId;
   });
-  it('POST getFundCustodyAccountHistory -- invalid account ID', async () => {
-    const response = await post('/getFundCustodyAccountHistory', {
+  it('POST getCustodyFundMoveHistory -- invalid account ID', async () => {
+    const response = await post('/getCustodyFundMoveHistory', {
       accountId: '01853700',
     });
     expect(response.data).toStrictEqual({
@@ -19,8 +19,8 @@ describe('custody', () => {
     });
     expect(response.status).toStrictEqual(400);
   });
-  it('POST getFundCustodyAccountHistory -- account ID not found', async () => {
-    const response = await post('/getFundCustodyAccountHistory', {
+  it('POST getCustodyFundMoveHistory -- account ID not found', async () => {
+    const response = await post('/getCustodyFundMoveHistory', {
       accountId: 'A000000',
     });
     expect(response.data).toStrictEqual({
@@ -30,8 +30,8 @@ describe('custody', () => {
     });
     expect(response.status).toStrictEqual(404);
   });
-  it('POST getFundCustodyAccountHistory -- success', async () => {
-    const response = await post('/getFundCustodyAccountHistory', {
+  it('POST getCustodyFundMoveHistory -- success', async () => {
+    const response = await post('/getCustodyFundMoveHistory', {
       accountId,
     });
     expect(response.data).toStrictEqual({
@@ -40,13 +40,11 @@ describe('custody', () => {
       custodyTransactions: expect.arrayContaining([
         {
           accountId,
-          tradeId: expect.any(String),
-          offeringId: expect.any(String),
           bankName: expect.any(String),
           totalAmount: expect.any(String),
           accountNumber: expect.any(String),
           routingNumber: expect.any(String),
-          accountHolderName: expect.any(String),
+          accountName: expect.any(String),
           referenceNumber: expect.any(String),
           description: expect.any(String),
           status: expect.any(String),
@@ -66,8 +64,8 @@ describe('custody', () => {
     expect(response.status).toStrictEqual(200);
     referenceNumber = response.data.custodyTransactions[0].referenceNumber;
   });
-  it('POST getFundCustodyAccountHistory -- get first record', async () => {
-    const response = await post('/getFundCustodyAccountHistory?limit=1', {
+  it('POST getCustodyFundMoveHistory -- get first record', async () => {
+    const response = await post('/getCustodyFundMoveHistory?limit=1', {
       accountId,
     });
     expect(response.data).toStrictEqual({
@@ -76,13 +74,11 @@ describe('custody', () => {
       custodyTransactions: [
         {
           accountId,
-          tradeId: expect.any(String),
-          offeringId: expect.any(String),
           bankName: expect.any(String),
           totalAmount: expect.any(String),
           accountNumber: expect.any(String),
           routingNumber: expect.any(String),
-          accountHolderName: expect.any(String),
+          accountName: expect.any(String),
           referenceNumber,
           description: expect.any(String),
           status: expect.any(String),
@@ -101,8 +97,8 @@ describe('custody', () => {
     });
     expect(response.status).toStrictEqual(200);
   });
-  it('POST getFundCustodyAccountHistory -- get second record', async () => {
-    const response = await post('/getFundCustodyAccountHistory?limit=1&offset=1', {
+  it('POST getCustodyFundMoveHistory -- get second record', async () => {
+    const response = await post('/getCustodyFundMoveHistory?limit=1&offset=1', {
       accountId,
     });
     expect(response.data).toStrictEqual({
@@ -110,20 +106,18 @@ describe('custody', () => {
       statusDesc: 'Ok',
       custodyTransactions: [
         {
-          accountHolderName: expect.any(String),
+          accountName: expect.any(String),
           accountId,
           accountNumber: expect.any(String),
           bankName: expect.any(String),
           description: expect.any(String),
           errors: expect.any(String),
           fundStatus: expect.any(String),
-          offeringId: expect.any(String),
           referenceNumber: expect.any(String),
           routingNumber: expect.any(String),
           routingNumberStatus: expect.any(String),
           status: expect.any(String),
           totalAmount: expect.any(String),
-          tradeId: expect.any(String),
           createdDate: expect.any(String),
           updatedDate: expect.any(String),
         },
@@ -137,8 +131,8 @@ describe('custody', () => {
     expect(response.data.custodyTransactions[0].referenceNumber).not.toEqual(referenceNumber);
     expect(response.status).toStrictEqual(200);
   });
-  it('POST getFundCustodyAccount -- invalid reference number', async () => {
-    const response = await post('/getFundCustodyAccount', {
+  it('POST getCustodyFundMove -- invalid reference number', async () => {
+    const response = await post('/getCustodyFundMove', {
       accountId,
       referenceNumber: 'kjaowighoapgjawegiaefaw',
     });
@@ -149,8 +143,8 @@ describe('custody', () => {
     });
     expect(response.status).toStrictEqual(400);
   });
-  it('POST getFundCustodyAccount -- invalid account ID', async () => {
-    const response = await post('/getFundCustodyAccount', {
+  it('POST getCustodyFundMove -- invalid account ID', async () => {
+    const response = await post('/getCustodyFundMove', {
       accountId: '01853700',
       referenceNumber,
     });
@@ -161,8 +155,8 @@ describe('custody', () => {
     });
     expect(response.status).toStrictEqual(400);
   });
-  it('POST getFundCustodyAccount -- account ID not found', async () => {
-    const response = await post('/getFundCustodyAccount', {
+  it('POST getCustodyFundMove -- account ID not found', async () => {
+    const response = await post('/getCustodyFundMove', {
       accountId: 'A000000',
       referenceNumber,
     });
@@ -173,8 +167,8 @@ describe('custody', () => {
     });
     expect(response.status).toStrictEqual(404);
   });
-  it('POST getFundCustodyAccount -- reference number does not exist', async () => {
-    const response = await post('/getFundCustodyAccount', {
+  it('POST getCustodyFundMove -- reference number does not exist', async () => {
+    const response = await post('/getCustodyFundMove', {
       accountId,
       referenceNumber: 'kjld',
     });
@@ -185,8 +179,8 @@ describe('custody', () => {
     });
     expect(response.status).toStrictEqual(404);
   });
-  it('POST getFundCustodyAccount -- success', async () => {
-    const response = await post('/getFundCustodyAccount', {
+  it('POST getCustodyFundMove -- success', async () => {
+    const response = await post('/getCustodyFundMove', {
       accountId,
       referenceNumber,
     });
@@ -195,13 +189,11 @@ describe('custody', () => {
       statusDesc: 'Ok',
       custodyTransaction: {
         accountId,
-        tradeId: expect.any(String),
-        offeringId: expect.any(String),
         bankName: expect.any(String),
         totalAmount: expect.any(String),
         accountNumber: expect.any(String),
         routingNumber: expect.any(String),
-        accountHolderName: expect.any(String),
+        accountName: expect.any(String),
         referenceNumber,
         description: expect.any(String),
         status: expect.any(String),
