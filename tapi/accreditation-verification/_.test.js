@@ -1,4 +1,4 @@
-const { requestVerification, getVerificationStatus, uploadVerificationDocument } = require('.');
+const { requestVerification, getVerificationStatus, uploadVerificationDocument, updateVerification } = require('.');
 
 const { parties, accounts, links } = require('..');
 const { userToParty } = require('../parties/util');
@@ -18,6 +18,7 @@ describe('accrediation-verification/need more info', () => {
   let partyId;
   let accountId;
   let linkId;
+  let aiRequestId;
   beforeAll(async () => {
     const user = {
       email: 'testuser@test.com',
@@ -78,6 +79,7 @@ describe('accrediation-verification/need more info', () => {
         ],
       }),
     );
+    aiRequestId = response.data.accreditedDetails.at(0).airequestId;
   });
   it('getVerificationStatus (getAiRequest) -- pending', async () => {
     expect(typeof accountId).toBe('string');
@@ -101,6 +103,23 @@ describe('accrediation-verification/need more info', () => {
             }),
           ]),
         }),
+      }),
+    );
+  });
+  it('updateVerification (updateAiRequest)', async () => {
+    expect(typeof aiRequestId).toBe('string');
+    const response = await updateVerification(aiRequestId);
+    expect(response.data).toStrictEqual(
+      expect.objectContaining({
+        statusCode: '101',
+        accreditedDetails: [
+          {
+            accountId,
+            airequestId: aiRequestId,
+            accreditedStatus: 'pending',
+            aiRequestStatus: 'New Info Added',
+          },
+        ],
       }),
     );
   });
